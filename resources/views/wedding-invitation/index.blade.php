@@ -363,7 +363,7 @@ body {
                 <div>
                     <span id="days">0</span>
                     <small>Days</small>
-                </div>
+                </div> 
                 <div>
                     <span id="hours">0</span>
                     <small>Hours</small>
