@@ -16,13 +16,17 @@ class marriedController extends Controller
 
     public function index($uuid)
     {
-        $response = Http::withHeaders([
-            'Accept' => 'application/json',
-        ])->get("{$this->baseUrl}", [
-            'uuid' => $uuid
-        ]);
-        return view('wedding-invitation.index', [
-            'data' => $response->json()['data'] ?? null,
-        ]);
+        if(empty($uuid)) {
+            return view('wedding-invitation.index');
+        }else{
+            $response = Http::withHeaders([
+                'Accept' => 'application/json',
+            ])->get("{$this->baseUrl}", [
+                'uuid' => $uuid
+            ]);
+            return view('wedding-invitation.index', [
+                'data' => $response->json()['data'] ?? null,
+            ]);
+        }
     }
 }
