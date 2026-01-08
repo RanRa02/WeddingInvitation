@@ -15,9 +15,7 @@ class marriedController extends Controller
 
     public function index()
     {
-        return view('wedding-invitation.index', [
-            'key' => 'notepeople',
-        ]);
+        return view('wedding-invitation.index');
     }
 
     public function people(string $uuid)
@@ -33,7 +31,6 @@ class marriedController extends Controller
         }
 
         return view('wedding-invitation.index', [
-            'key' => 'people',
             'data'     => $data,
         ]);
     }
