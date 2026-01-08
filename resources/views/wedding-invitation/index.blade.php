@@ -380,13 +380,18 @@ body {
 
             <!-- Date & Location -->
             <div class="fade-in-up mt-4 battambang" style="animation-delay:1.2s">
-                <h4 class="name muol">
+                {{-- <h4 class="name muol">
                     ថ្ងៃចន្ទ ទី១៨ ខែមករា ឆ្នាំ២០២៦ វេលាម៉ោង ៨៖០០ ព្រឹក
                 </h4>
                 <h4 class="name muol mt-3">
                     ស្ថិតនៅគេហដ្ឋានខាងស្រី ភូមិព្រៃខ្លាទី១ ឃុំព្រៃខ្លា
                     ស្រុកស្វាយអន្ទរ ខេត្តព្រៃវែង
-                </h4>
+                </h4> --}}
+                <p class="text-muted text-center" style="font-size: 20px;">
+                    ថ្ងៃចន្ទ ទី១៨ ខែមករា ឆ្នាំ២០២៦ វេលាម៉ោង ៨៖០០ ព្រឹក <br>
+                    ស្ថិតនៅគេហដ្ឋានខាងស្រី ភូមិព្រៃខ្លាទី១ ឃុំព្រៃខ្លា
+                        ស្រុកស្វាយអន្ទរ ខេត្តព្រៃវែង
+                </p>
             </div>
 
             <!-- Map -->
