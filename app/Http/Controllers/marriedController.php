@@ -27,14 +27,14 @@ class marriedController extends Controller
             ->get($this->baseUrl, [
                 'uuid' => $uuid
             ]);
-
+        $data = $response->json();
         if (! $response->successful()) {
             abort(404, 'Invitation not found');
         }
 
         return view('wedding-invitation.index', [
             'key' => 'people',
-            'data' => $response->json(),
+            'data'     => $data,
         ]);
     }
 }

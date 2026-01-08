@@ -355,7 +355,7 @@ body {
                     <div class="name-frame-text muol">
                         <span class="name" style="font-size: 25px; text-shadow:2px 2px 2px 2px #000;">
                             @if(($key ?? null) === 'notepeople')
-                                {{ $data['nickname'] }}
+                                {{ $data['nickname'] ?? '' }}
                             @endif
                         </span>
                     </div>
