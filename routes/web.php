@@ -18,7 +18,7 @@ Route::group([
         'namespace' => 'WeddingInvitation',
         'as' => 'wedding-invitation.'
     ], function () {
-        Route::get('/', [MarriedController::class, 'index'])
+        Route::get('/index', [MarriedController::class, 'index'])
             ->name('index');
 
         // Invitation by UUID
