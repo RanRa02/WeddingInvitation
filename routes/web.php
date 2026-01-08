@@ -14,10 +14,10 @@ use App\Http\Controllers\marriedController;
 */
 
 Route::group([
-        'prefix' => 'wedding-invitation',
-        'namespace' => 'WeddingInvitation',
-        'as' => 'wedding-invitation.'
-    ], function () {
-        Route::get('{uuid}/index', [marriedController::class, 'index'])->name('.index');
-    }
-);
+    'prefix' => 'wedding-invitation',
+    'as' => 'wedding-invitation.'
+], function () {
+    Route::get('{uuid}/index', [\App\Http\Controllers\marriedController::class, 'index'])
+        ->name('index');
+});
+

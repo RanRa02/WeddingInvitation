@@ -1,9 +1,8 @@
 <?php
 
 namespace App\Http\Controllers;
-use Illuminate\Support\Facades\Http;
 
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 
 class marriedController extends Controller
 {
@@ -11,22 +10,22 @@ class marriedController extends Controller
 
     public function __construct()
     {
-        $this->baseUrl = rtrim(env('API_BASE_URL'), '/');
+        $this->baseUrl = rtrim(config('services.api.base_url'), '/');
     }
 
-    public function index($uuid)
+    public function index(string $uuid)
     {
-        if(empty($uuid)) {
-            return view('wedding-invitation.index');
-        }else{
-            $response = Http::withHeaders([
-                'Accept' => 'application/json',
-            ])->get("{$this->baseUrl}", [
-                'uuid' => $uuid
-            ]);
-            return view('wedding-invitation.index', [
-                'data' => $response->json()['data'] ?? null,
-            ]);
+        $response = Http::acceptJson()
+            ->timeout(10)
+            ->get($this->baseUrl, ['uuid' => $uuid]);
+
+        if (! $response->successful()) {
+            abort(404, 'Invitation not found');
         }
+
+        return view('wedding-invitation.index', [
+            'data' => $response->json('data'),
+        ]);
     }
 }
+
