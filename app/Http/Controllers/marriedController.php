@@ -13,7 +13,7 @@ class marriedController extends Controller
         $this->baseUrl = rtrim(config('services.api.base_url'), '/');
     }
 
-    public function index(string $uuid)
+    public function index()
     {
         // $response = Http::acceptJson()
         //     ->timeout(10)
