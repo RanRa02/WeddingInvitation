@@ -15,17 +15,15 @@ class marriedController extends Controller
 
     public function index(string $uuid)
     {
-        $response = Http::acceptJson()
-            ->timeout(10)
-            ->get($this->baseUrl, ['uuid' => $uuid]);
+        // $response = Http::acceptJson()
+        //     ->timeout(10)
+        //     ->get($this->baseUrl, ['uuid' => $uuid]);
 
-        if (! $response->successful()) {
-            abort(404, 'Invitation not found');
-        }
+        // if (! $response->successful()) {
+        //     abort(404, 'Invitation not found');
+        // }
 
-        return view('wedding-invitation.index', [
-            'data' => $response->json('data'),
-        ]);
+        return view('wedding-invitation.index');
     }
 }
 
