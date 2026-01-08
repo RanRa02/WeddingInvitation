@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\Http;
+use Illuminate\Http\Request;
 
 class marriedController extends Controller
 {
@@ -15,15 +16,17 @@ class marriedController extends Controller
 
     public function index()
     {
-        // $response = Http::acceptJson()
-        //     ->timeout(10)
-        //     ->get($this->baseUrl, ['uuid' => $uuid]);
+        $response = Http::acceptJson()
+            ->timeout(10)
+            ->get($this->baseUrl, ['uuid' => request()->query('uuid')]);
 
-        // if (! $response->successful()) {
-        //     abort(404, 'Invitation not found');
-        // }
+        if (! $response->successful()) {
+            abort(404, 'Invitation not found');
+        }
 
-        return view('wedding-invitation.index');
+        return view('wedding-invitation.index', [
+            'data' => $response->json(),
+        ]);
     }
 }
 
