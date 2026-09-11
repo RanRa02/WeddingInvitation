@@ -83,7 +83,7 @@ return [
     |
     */
 
-    'locale' => 'en',
+    'locale' => 'kh',
 
     /*
     |--------------------------------------------------------------------------
@@ -184,5 +184,31 @@ return [
     'aliases' => Facade::defaultAliases()->merge([
         // 'Example' => App\Facades\Example::class,
     ])->toArray(),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Global Application Theme & Background Color Configurations
+    |--------------------------------------------------------------------------
+    |
+    | Centralized definition of all common background colors, gradients,
+    | and component styles used across the system layout.
+    |
+    */
+
+    'theme' => [
+        'primary_color'      => env('THEME_PRIMARY_COLOR', '#1877f2'),
+        'primary_hover'      => env('THEME_PRIMARY_HOVER', '#0866ff'),
+        'primary_gradient'   => env('THEME_PRIMARY_GRADIENT', 'linear-gradient(135deg, #1877f2 0%, #0866ff 100%)'),
+        'primary_tint'       => env('THEME_PRIMARY_TINT', '#e7f3ff'),
+        'navbar_bg'          => env('THEME_NAVBAR_BG', 'linear-gradient(135deg, #1877f2 0%, #0866ff 100%)'),
+        'sidebar_header_bg'  => env('THEME_SIDEBAR_HEADER_BG', 'linear-gradient(135deg, #1877f2 0%, #0866ff 100%)'),
+        'table_header_bg'    => env('THEME_TABLE_HEADER_BG', '#1877f2'),
+        'table_even_bg'      => env('THEME_TABLE_EVEN_BG', '#f8fafc'),
+        'table_hover_bg'     => env('THEME_TABLE_HOVER_BG', '#edf5ff'),
+        'badge_bg'           => env('THEME_BADGE_BG', '#e7f3ff'),
+        'badge_color'        => env('THEME_BADGE_COLOR', '#1877f2'),
+        'badge_border'       => env('THEME_BADGE_BORDER', '#c8e1ff'),
+        'body_bg'            => env('THEME_BODY_BG', '#f8f9fa'),
+    ],
 
 ];

@@ -1,0 +1,15 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Wedding Invitation//KM
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+BEGIN:VEVENT
+SUMMARY:អាពាហ៍ពិពាហ៍ រ៉ាន់ រ៉ា & ខុម ស្រីណេត (Wedding: Ran Ra & Khom Sreynet)
+DESCRIPTION:សូមអញ្ជើញចូលរួមពិធីសិរីមង្គលអាពាហ៍ពិពាហ៍រវាង កូនប្រុស រ៉ាន់ រ៉ា និង កូនស្រី ខុម ស្រីណេត ស្ថិតនៅគេហដ្ឋានខាងស្រី ភូមិព្រៃខ្លាទី១ ឃុំព្រៃខ្លា ស្រុកស្វាយអន្ទរ ខេត្តព្រៃវែង
+LOCATION:ភូមិព្រៃខ្លាទី១ ឃុំព្រៃខ្លា ស្រុកស្វាយអន្ទរ ខេត្តព្រៃវែង
+DTSTART:20270411T073000Z
+DTEND:20270411T210000Z
+STATUS:CONFIRMED
+SEQUENCE:0
+END:VEVENT
+END:VCALENDAR

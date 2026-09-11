@@ -1,3 +1,6 @@
+<!-- Local Google Fonts CSS -->
+<link href="{{ asset('assets/fonts/google/google_fonts.css') }}" rel="stylesheet">
+
 <style>
     @media all {
         @font-face {
@@ -48,11 +51,11 @@
         }
 
         .battambang {
-            font-family: 'Times New Roman', 'battambang', sans-serif !important;
+            font-family: 'Kantumruy Pro', 'Times New Roman', 'battambang', sans-serif !important;
         }
 
         .muol {
-            font-family: 'Times New Roman', 'muol', sans-serif !important;
+            font-family: 'Koh Santepheap', 'muol', 'Times New Roman', serif !important;
         }
 
         .times {
@@ -64,7 +67,7 @@
         }
 
         .battambang.text-bold {
-            font-family: 'Times New Roman', 'Battambang Bold' !important;
+            font-family: 'Kantumruy Pro', 'Battambang Bold', sans-serif !important;
             font-weight: bold !important;
         }
     }
