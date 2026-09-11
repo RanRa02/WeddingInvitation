@@ -18,13 +18,8 @@ class SystemStructureSeeder extends Seeder
         DB::transaction(function () {
             // Modules
             $settingModule = Module::updateOrCreate(
-                ['name' => 'Setting'],
-                ['name_kh' => 'កំណត់', 'icon' => 'fa-cog', 'sort_order' => 1, 'status' => 'active']
-            );
-
-            $guestModule = Module::updateOrCreate(
-                ['name' => 'Guests & RSVP'],
-                ['name_kh' => 'ភ្ញៀវ និងការឆ្លើយតប', 'icon' => 'fa-users', 'sort_order' => 2, 'status' => 'active']
+                ['name' => 'Role & Menu Settings'],
+                ['name_kh' => 'ការកំណត់ម៉ឺនុយ និងសិទ្ធិ', 'icon' => 'fa-cog', 'sort_order' => 1, 'status' => 'active']
             );
 
             // Sub-Modules

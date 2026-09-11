@@ -236,82 +236,157 @@ class DatabaseSeeder extends Seeder
         }
 
         // 4. Seed Modules & Pages
-        $dashModule = \App\Models\Module::updateOrCreate(
-            ['name' => 'Dashboard'],
-            ['name_kh' => 'ផ្ទាំងគ្រប់គ្រង', 'icon' => 'fa-home', 'sort_order' => 1, 'status' => 'active']
+        // Clean up unused module records
+        \App\Models\Module::whereNotIn('name', ['Role & Menu Settings'])->delete();
+
+        // Only ONE Module: Role & Menu Settings
+        $roleMenuModule = \App\Models\Module::updateOrCreate(
+            ['name' => 'Role & Menu Settings'],
+            ['name_kh' => 'ការកំណត់ម៉ឺនុយ និងសិទ្ធិ', 'icon' => 'fa-cog', 'sort_order' => 1, 'status' => 'active']
         );
+
+        // Clean up unused page records
+        $activeRoutes = [
+            'admin.dashboard',
+            'admin.guests.index',
+            'admin.users.index',
+            'admin.plans.index',
+            'admin.menu-settings.modules.index',
+            'admin.menu-settings.pages.index',
+            'admin.menu-settings.roles.index',
+            'customer.dashboard',
+            'customer.wedding.create',
+            'home'
+        ];
+        \App\Models\Page::whereNotIn('route_name', $activeRoutes)->delete();
+
+        // Seed Pages under Role & Menu Settings module
         \App\Models\Page::updateOrCreate(
             ['route_name' => 'admin.dashboard'],
             [
-                'module_id' => $dashModule->id,
-                'name' => 'Dashboard Page',
-                'name_kh' => 'ទំព័រដើម',
+                'module_id' => $roleMenuModule->id,
+                'name' => 'Dashboard',
+                'name_kh' => 'ផ្ទាំងគ្រប់គ្រង',
                 'url_path' => '/admin/dashboard',
-                'icon' => 'fa-home',
+                'icon' => 'fa-th-large',
                 'sort_order' => 1,
                 'status' => 'active'
             ]
         );
 
-        $guestModule = \App\Models\Module::updateOrCreate(
-            ['name' => 'Guest Management'],
-            ['name_kh' => 'គ្រប់គ្រងភ្ញៀវ', 'icon' => 'fa-address-book', 'sort_order' => 2, 'status' => 'active']
-        );
         \App\Models\Page::updateOrCreate(
             ['route_name' => 'admin.guests.index'],
             [
-                'module_id' => $guestModule->id,
-                'name' => 'Guest List',
-                'name_kh' => 'បញ្ជីភ្ញៀវ',
+                'module_id' => $roleMenuModule->id,
+                'name' => 'Guest Management',
+                'name_kh' => 'គ្រប់គ្រងភ្ញៀវ',
                 'url_path' => '/admin/guests',
-                'icon' => 'fa-address-book',
-                'sort_order' => 1,
+                'icon' => 'fa-folder-open',
+                'sort_order' => 2,
                 'status' => 'active'
             ]
         );
 
-        $userModule = \App\Models\Module::updateOrCreate(
-            ['name' => 'User Management'],
-            ['name_kh' => 'គ្រប់គ្រងអ្នកប្រើប្រាស់', 'icon' => 'fa-users-cog', 'sort_order' => 3, 'status' => 'active']
-        );
         \App\Models\Page::updateOrCreate(
             ['route_name' => 'admin.users.index'],
             [
-                'module_id' => $userModule->id,
-                'name' => 'Users List',
-                'name_kh' => 'បញ្ជីអ្នកប្រើប្រាស់',
+                'module_id' => $roleMenuModule->id,
+                'name' => 'User Management',
+                'name_kh' => 'គ្រប់គ្រងអ្នកប្រើប្រាស់',
                 'url_path' => '/admin/users',
-                'icon' => 'fa-users-cog',
-                'sort_order' => 1,
+                'icon' => 'fa-user',
+                'sort_order' => 3,
                 'status' => 'active'
             ]
         );
 
-        $systemModule = \App\Models\Module::updateOrCreate(
-            ['name' => 'Role & Menu Settings'],
-            ['name_kh' => 'ការកំណត់ម៉ឺនុយ និងសិទ្ធិ', 'icon' => 'fa-sliders-h', 'sort_order' => 4, 'status' => 'active']
-        );
-        $rolePage = \App\Models\Page::updateOrCreate(
-            ['route_name' => 'admin.roles.index'],
+        \App\Models\Page::updateOrCreate(
+            ['route_name' => 'admin.plans.index'],
             [
-                'module_id' => $systemModule->id,
-                'name' => 'User Roles',
-                'name_kh' => 'តួនាទីអ្នកប្រើប្រាស់',
-                'url_path' => '/admin/roles',
-                'icon' => 'fa-user-shield',
-                'sort_order' => 1,
+                'module_id' => $roleMenuModule->id,
+                'name' => 'Plans & Subscriptions',
+                'name_kh' => 'គ្រប់គ្រងកញ្ចប់សេវា',
+                'url_path' => '/admin/plans',
+                'icon' => 'fa-tags',
+                'sort_order' => 4,
                 'status' => 'active'
             ]
         );
-        $menuSettingPage = \App\Models\Page::updateOrCreate(
-            ['route_name' => 'admin.menu-settings.index'],
+
+        \App\Models\Page::updateOrCreate(
+            ['route_name' => 'admin.menu-settings.modules.index'],
             [
-                'module_id' => $systemModule->id,
-                'name' => 'Role & Menu Setting',
-                'name_kh' => 'ការកំណត់ម៉ឺនុយ និងសិទ្ធិ',
-                'url_path' => '/admin/menu-settings',
-                'icon' => 'fa-sliders-h',
-                'sort_order' => 2,
+                'module_id' => $roleMenuModule->id,
+                'name' => 'Modules Setup',
+                'name_kh' => 'កំណត់ម៉ូដ្យួល',
+                'url_path' => '/admin/menu-settings/modules',
+                'icon' => 'fa-folder-plus',
+                'sort_order' => 5,
+                'status' => 'active'
+            ]
+        );
+
+        \App\Models\Page::updateOrCreate(
+            ['route_name' => 'admin.menu-settings.pages.index'],
+            [
+                'module_id' => $roleMenuModule->id,
+                'name' => 'Pages Setup',
+                'name_kh' => 'កំណត់ទំព័រ',
+                'url_path' => '/admin/menu-settings/pages',
+                'icon' => 'fa-file-contract',
+                'sort_order' => 6,
+                'status' => 'active'
+            ]
+        );
+
+        \App\Models\Page::updateOrCreate(
+            ['route_name' => 'admin.menu-settings.roles.index'],
+            [
+                'module_id' => $roleMenuModule->id,
+                'name' => 'Roles Setup',
+                'name_kh' => 'កំណត់តួនាទី',
+                'url_path' => '/admin/menu-settings/roles',
+                'icon' => 'fa-user-shield',
+                'sort_order' => 7,
+                'status' => 'active'
+            ]
+        );
+
+        \App\Models\Page::updateOrCreate(
+            ['route_name' => 'customer.dashboard'],
+            [
+                'module_id' => $roleMenuModule->id,
+                'name' => 'Customer Portal',
+                'name_kh' => 'ច្រកទ្វារអតិថិជន',
+                'url_path' => '/customer/dashboard',
+                'icon' => 'fa-heart',
+                'sort_order' => 8,
+                'status' => 'active'
+            ]
+        );
+
+        \App\Models\Page::updateOrCreate(
+            ['route_name' => 'customer.wedding.create'],
+            [
+                'module_id' => $roleMenuModule->id,
+                'name' => 'Wedding Builder & Templates',
+                'name_kh' => 'ការបង្កើតអាពាហ៍ពិពាហ៍ និងទម្រង់',
+                'url_path' => '/customer/wedding/create',
+                'icon' => 'fa-magic',
+                'sort_order' => 9,
+                'status' => 'active'
+            ]
+        );
+
+        \App\Models\Page::updateOrCreate(
+            ['route_name' => 'home'],
+            [
+                'module_id' => $roleMenuModule->id,
+                'name' => 'Public Landing Site',
+                'name_kh' => 'គេហទំព័រសាធារណៈ',
+                'url_path' => '/',
+                'icon' => 'fa-external-link-alt',
+                'sort_order' => 10,
                 'status' => 'active'
             ]
         );

@@ -130,4 +130,84 @@ class GlobalHelper
             'restore' => $pageActions['restore'] ?? null,
         ];
     }
+
+    /**
+     * Map page actions by page, module, and sub-module (wis-hr compatibility).
+     *
+     * @return array
+     */
+    public function getActionsBy()
+    {
+        $pages = Page::all()->toArray();
+        $actions = PageAction::orderBy('order', 'asc')->get()->toArray();
+
+        $actionsData = [];
+        foreach ($actions as $action) {
+            $actionsData[$action['page_id']][] = $action;
+        }
+
+        $pagesData = [
+            'page_actions' => [],
+            'module_actions' => [],
+            'sub_module_actions' => [],
+        ];
+
+        foreach ($pages as $page) {
+            $pageActions = null;
+            if (isset($actionsData[$page['id']])) {
+                $pageActions = array_column($actionsData[$page['id']], 'id');
+                foreach ($pageActions as $pa) {
+                    $pagesData['page_actions'][$page['id']][] = $pa;
+                }
+            }
+
+            if ($page['module_id'] !== null && $pageActions !== null) {
+                foreach ($pageActions as $pa) {
+                    $pagesData['module_actions'][$page['module_id']][] = $pa;
+                }
+            }
+
+            if ($page['sub_module_id'] !== null && $pageActions !== null) {
+                foreach ($pageActions as $pa) {
+                    $pagesData['sub_module_actions'][$page['sub_module_id']][] = $pa;
+                }
+            }
+        }
+
+        return $pagesData;
+    }
+
+    /**
+     * Get all modules array.
+     */
+    public function getModules()
+    {
+        return Module::where('status', 'active')->orderBy('sort_order', 'asc')->get();
+    }
+
+    /**
+     * Get sub-modules for a module.
+     */
+    public function getSubModules($moduleId = null)
+    {
+        $query = \App\Models\SubModule::query();
+        if ($moduleId) {
+            $query->where('module_id', $moduleId);
+        }
+        return $query->orderBy('sort_order', 'asc')->get();
+    }
+
+    /**
+     * Get pages for module/submodule.
+     */
+    public function getPages($moduleId = null, $subModuleId = null)
+    {
+        $query = Page::query();
+        if ($subModuleId) {
+            $query->where('sub_module_id', $subModuleId);
+        } elseif ($moduleId) {
+            $query->where('module_id', $moduleId);
+        }
+        return $query->orderBy('sort_order', 'asc')->get();
+    }
 }

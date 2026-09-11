@@ -255,5 +255,31 @@
 
 @push('scripts')
     {!! $dataTable->scripts() !!}
+    <script>
+        $(document).ready(function() {
+            $('select[name="module_id"]').on('change', function() {
+                var moduleId = $(this).val();
+                var $subModuleSelect = $(this).closest('form').find('select[name="sub_module_id"]');
+                
+                if (!moduleId) {
+                    $subModuleSelect.html('<option value="">None</option>');
+                    return;
+                }
+
+                $.ajax({
+                    url: '{{ route("admin.menu-settings.sub-modules.get-by-moduleid") }}',
+                    type: 'GET',
+                    data: { module_id: moduleId },
+                    success: function(data) {
+                        var options = '<option value="">None</option>';
+                        $.each(data, function(index, item) {
+                            options += '<option value="' + item.id + '">' + item.name + (item.name_kh ? ' (' + item.name_kh + ')' : '') + '</option>';
+                        });
+                        $subModuleSelect.html(options);
+                    }
+                });
+            });
+        });
+    </script>
 @endpush
 @endsection

@@ -23,7 +23,7 @@ return new class extends Migration
 
         Schema::create('pages', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('module_id')->constrained('modules')->onDelete('cascade');
+            $table->foreignId('module_id')->nullable()->constrained('modules')->onDelete('cascade');
             $table->string('name');
             $table->string('name_kh')->nullable();
             $table->string('route_name')->nullable();

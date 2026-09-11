@@ -691,7 +691,7 @@
             @if(auth()->check() && auth()->user()->isAdmin())
                 <li class="px-3 mb-2 text-muted fw-bold text-uppercase" style="font-size: 11px; letter-spacing: 0.5px;">Admin Management</li>
                 
-                <li class="dreams-menu-item">
+                <li class="dreams-menu-item" data-type="page">
                     <a href="{{ route('admin.dashboard') }}" class="dreams-menu-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
                         <div>
                             <i class="fas fa-th-large menu-icon me-2"></i>
@@ -700,7 +700,7 @@
                         <i class="fas fa-chevron-right chevron-right"></i>
                     </a>
                 </li>
-                <li class="dreams-menu-item">
+                <li class="dreams-menu-item" data-type="page">
                     <a href="{{ route('admin.guests.index') }}" class="dreams-menu-link {{ request()->routeIs('admin.guests.*') ? 'active' : '' }}">
                         <div>
                             <i class="fas fa-folder-open menu-icon me-2"></i>
@@ -709,7 +709,7 @@
                         <i class="fas fa-chevron-right chevron-right"></i>
                     </a>
                 </li>
-                <li class="dreams-menu-item">
+                <li class="dreams-menu-item" data-type="page">
                     <a href="{{ route('admin.plans.index') }}" class="dreams-menu-link {{ request()->routeIs('admin.plans.*') ? 'active' : '' }}">
                         <div>
                             <i class="fas fa-tags text-warning menu-icon me-2"></i>
@@ -719,11 +719,11 @@
                     </a>
                 </li>
 
-                <!-- Collapsible Role and Menu Setting Accordion Dropdown (Super Admin Only) -->
+                <!-- Collapsible Role and Menu Setting Accordion Dropdown (Super Admin Only - Module Container) -->
                 @php
                     $isSettingActive = request()->routeIs('admin.menu-settings.*', 'admin.roles.*', 'admin.users.*');
                 @endphp
-                <li class="dreams-menu-item mb-2">
+                <li class="dreams-menu-item mb-2" data-type="module">
                     <a href="#roleMenuDropdown" 
                        class="dreams-menu-link parent-dropdown d-flex align-items-center justify-content-between text-decoration-none" 
                        data-bs-toggle="collapse" 
@@ -738,28 +738,28 @@
 
                     <div class="collapse {{ $isSettingActive ? 'show' : '' }}" id="roleMenuDropdown">
                         <ul class="dreams-submenu-container list-unstyled mb-0 pt-2 pb-2">
-                            <li class="mb-1">
+                            <li class="mb-1" data-type="page">
                                 <a href="{{ route('admin.menu-settings.modules.index') }}" 
                                    class="submenu-item-link {{ request()->routeIs('admin.menu-settings.modules.*') ? 'active-sub' : '' }}">
                                     <i class="fas fa-folder-plus text-primary"></i>
                                     <span>{{ __('Modules Setup') }}</span>
                                 </a>
                             </li>
-                            <li class="mb-1">
+                            <li class="mb-1" data-type="page">
                                 <a href="{{ route('admin.menu-settings.pages.index') }}" 
                                    class="submenu-item-link {{ request()->routeIs('admin.menu-settings.pages.*') ? 'active-sub' : '' }}">
                                     <i class="fas fa-file-contract text-primary"></i>
                                     <span>{{ __('Pages Setup') }}</span>
                                 </a>
                             </li>
-                            <li class="mb-1">
+                            <li class="mb-1" data-type="page">
                                 <a href="{{ route('admin.menu-settings.roles.index') }}" 
                                    class="submenu-item-link {{ request()->routeIs('admin.menu-settings.roles.*') ? 'active-sub' : '' }}">
                                     <i class="fas fa-user-shield text-primary"></i>
                                     <span>{{ __('Roles Setup') }}</span>
                                 </a>
                             </li>
-                            <li class="mb-1">
+                            <li class="mb-1" data-type="page">
                                 <a href="{{ route('admin.users.index') }}" 
                                    class="submenu-item-link {{ request()->routeIs('admin.users.*') ? 'active-sub' : '' }}">
                                     <i class="fas fa-user text-primary"></i>
@@ -773,7 +773,7 @@
                 <!-- Customer System & Wedding Builder Section for Admin -->
                 <li class="px-3 mt-3 mb-2 text-muted fw-bold text-uppercase" style="font-size: 11px; letter-spacing: 0.5px;">Customer System & Builder</li>
                 
-                <li class="dreams-menu-item">
+                <li class="dreams-menu-item" data-type="page">
                     <a href="{{ route('customer.dashboard') }}" class="dreams-menu-link {{ request()->routeIs('customer.dashboard') ? 'active' : '' }}">
                         <div>
                             <i class="fas fa-heart text-danger menu-icon me-2"></i>
@@ -782,7 +782,7 @@
                         <i class="fas fa-chevron-right chevron-right"></i>
                     </a>
                 </li>
-                <li class="dreams-menu-item">
+                <li class="dreams-menu-item" data-type="page">
                     <a href="{{ route('customer.wedding.create') }}" class="dreams-menu-link {{ request()->routeIs('customer.wedding.*') ? 'active' : '' }}">
                         <div>
                             <i class="fas fa-magic text-warning menu-icon me-2"></i>
@@ -791,7 +791,7 @@
                         <i class="fas fa-chevron-right chevron-right"></i>
                     </a>
                 </li>
-                <li class="dreams-menu-item">
+                <li class="dreams-menu-item" data-type="page">
                     <a href="{{ route('customer.subscriptions.plans') }}" class="dreams-menu-link {{ request()->routeIs('customer.subscriptions.*') ? 'active' : '' }}">
                         <div>
                             <i class="fas fa-credit-card text-info menu-icon me-2"></i>
@@ -804,7 +804,7 @@
                 <!-- Customer Menu Functions (Exact Same Admin Layout, Different Functions) -->
                 <li class="px-3 mb-2 text-muted fw-bold text-uppercase" style="font-size: 11px; letter-spacing: 0.5px;">Customer Menu</li>
 
-                <li class="dreams-menu-item">
+                <li class="dreams-menu-item" data-type="page">
                     <a href="{{ route('customer.dashboard') }}" class="dreams-menu-link {{ request()->routeIs('customer.dashboard') ? 'active' : '' }}">
                         <div>
                             <i class="fas fa-tachometer-alt menu-icon me-2 text-warning"></i>
@@ -813,7 +813,7 @@
                         <i class="fas fa-chevron-right chevron-right"></i>
                     </a>
                 </li>
-                <li class="dreams-menu-item">
+                <li class="dreams-menu-item" data-type="page">
                     <a href="{{ route('customer.subscriptions.plans') }}" class="dreams-menu-link {{ request()->routeIs('customer.subscriptions.*') ? 'active' : '' }}">
                         <div>
                             <i class="fas fa-credit-card menu-icon me-2 text-info"></i>
@@ -822,7 +822,7 @@
                         <i class="fas fa-chevron-right chevron-right"></i>
                     </a>
                 </li>
-                <li class="dreams-menu-item">
+                <li class="dreams-menu-item" data-type="page">
                     <a href="{{ route('customer.wedding.create') }}" class="dreams-menu-link {{ request()->routeIs('customer.wedding.create') ? 'active' : '' }}">
                         <div>
                             <i class="fas fa-heart menu-icon me-2 text-danger"></i>
@@ -831,7 +831,7 @@
                         <i class="fas fa-chevron-right chevron-right"></i>
                     </a>
                 </li>
-                <li class="dreams-menu-item">
+                <li class="dreams-menu-item" data-type="page">
                     <a href="{{ route('customer.wedding.template') }}" class="dreams-menu-link {{ request()->routeIs('customer.wedding.template') ? 'active' : '' }}">
                         <div>
                             <i class="fas fa-paint-brush menu-icon me-2 text-success"></i>
@@ -840,7 +840,7 @@
                         <i class="fas fa-chevron-right chevron-right"></i>
                     </a>
                 </li>
-                <li class="dreams-menu-item">
+                <li class="dreams-menu-item" data-type="page">
                     <a href="{{ route('customer.guests.index') }}" class="dreams-menu-link {{ request()->routeIs('customer.guests.*') ? 'active' : '' }}">
                         <div>
                             <i class="fas fa-users menu-icon me-2 text-primary"></i>
@@ -849,7 +849,7 @@
                         <i class="fas fa-chevron-right chevron-right"></i>
                     </a>
                 </li>
-                <li class="dreams-menu-item">
+                <li class="dreams-menu-item" data-type="page">
                     <a href="{{ route('customer.invitations.send') }}" class="dreams-menu-link {{ request()->routeIs('customer.invitations.*') ? 'active' : '' }}">
                         <div>
                             <i class="fas fa-paper-plane menu-icon me-2 text-warning"></i>
@@ -858,7 +858,7 @@
                         <i class="fas fa-chevron-right chevron-right"></i>
                     </a>
                 </li>
-                <li class="dreams-menu-item">
+                <li class="dreams-menu-item" data-type="page">
                     <a href="{{ route('customer.reports.index') }}" class="dreams-menu-link {{ request()->routeIs('customer.reports.*') ? 'active' : '' }}">
                         <div>
                             <i class="fas fa-chart-line menu-icon me-2 text-info"></i>
@@ -870,7 +870,7 @@
             @endif
 
             <hr class="my-3 border-secondary opacity-10">
-            <li class="dreams-menu-item">
+            <li class="dreams-menu-item" data-type="page">
                 <a href="{{ route('home') }}" target="_blank" class="dreams-menu-link text-muted">
                     <div>
                         <i class="fas fa-external-link-alt menu-icon me-2"></i>
@@ -988,18 +988,15 @@
             });
         });
 
-        // Set DataTables error mode to throw to avoid alert dialogs
         if (window.jQuery && $.fn && $.fn.dataTable) {
             $.fn.dataTable.ext.errMode = 'none';
         }
 
-        // Initialize DataTables automatically for static list tables ONLY (.table-gold-header, .datatable)
         $(document).ready(function() {
             $('.table-gold-header, .datatable').each(function() {
                 var table = $(this);
                 var id = (table.attr('id') || '').toLowerCase();
                 
-                // Skip Yajra DataTables (which have their own script initialization) and already initialized tables
                 if (table.hasClass('yajra-datatable') || id.indexOf('datatable') !== -1 || $.fn.DataTable.isDataTable(table) || table.parents('.dataTables_wrapper').length) {
                     return;
                 }

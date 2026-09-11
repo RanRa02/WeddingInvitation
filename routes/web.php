@@ -110,6 +110,12 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.'], function () {
         Route::get('/menu-settings/page-actions', [MenuSettingController::class, 'pageActionsIndex'])->name('menu-settings.page-actions.index');
         Route::get('/menu-settings/roles', [MenuSettingController::class, 'rolesIndex'])->name('menu-settings.roles.index');
 
+        // AJAX Getters for Modules, Sub-Modules, Pages, Page Actions
+        Route::get('/menu-settings/get-modules', [MenuSettingController::class, 'getModules'])->name('menu-settings.get-modules');
+        Route::get('/menu-settings/sub-modules/get-by-moduleid', [MenuSettingController::class, 'getByModuleId'])->name('menu-settings.sub-modules.get-by-moduleid');
+        Route::get('/menu-settings/pages/get-by-moduleid', [MenuSettingController::class, 'getPagesByModuleId'])->name('menu-settings.pages.get-by-moduleid');
+        Route::get('/menu-settings/page-actions/get-by-pageid', [MenuSettingController::class, 'getPageActionsByPageId'])->name('menu-settings.page-actions.get-by-pageid');
+
         // Modules CRUD & Import
         Route::post('/menu-settings/modules', [MenuSettingController::class, 'storeModule'])->name('menu-settings.modules.store');
         Route::put('/menu-settings/modules/{module}', [MenuSettingController::class, 'updateModule'])->name('menu-settings.modules.update');

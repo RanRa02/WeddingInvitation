@@ -584,4 +584,44 @@ class MenuSettingController extends Controller
 
         return redirect()->back()->with('success', $import->getMessage());
     }
+
+    /**
+     * AJAX Getter methods following wis-hr conventions
+     */
+    public function getModules(Request $request)
+    {
+        $modules = Module::select('id', 'name as text', 'name', 'name_kh', 'icon')->orderBy('sort_order', 'asc')->get();
+        return response()->json($modules);
+    }
+
+    public function getByModuleId(Request $request)
+    {
+        $subModules = SubModule::select('id', 'name as text', 'name', 'name_kh', 'module_id')
+            ->where('module_id', $request->module_id)
+            ->orderBy('sort_order', 'asc')
+            ->get();
+        return response()->json($subModules);
+    }
+
+    public function getPagesByModuleId(Request $request)
+    {
+        $query = Page::select('id', 'name as text', 'name', 'name_kh', 'module_id', 'sub_module_id');
+        if ($request->filled('module_id')) {
+            $query->where('module_id', $request->module_id);
+        }
+        if ($request->filled('sub_module_id')) {
+            $query->where('sub_module_id', $request->sub_module_id);
+        }
+        $pages = $query->orderBy('sort_order', 'asc')->get();
+        return response()->json($pages);
+    }
+
+    public function getPageActionsByPageId(Request $request)
+    {
+        $pageActions = PageAction::select('id', 'name as text', 'name', 'name_kh', 'page_id', 'type', 'position', 'route_name')
+            ->where('page_id', $request->page_id)
+            ->orderBy('order', 'asc')
+            ->get();
+        return response()->json($pageActions);
+    }
 }

@@ -272,5 +272,22 @@
 
 @push('scripts')
     {!! $dataTable->scripts() !!}
+    <script>
+        $(document).ready(function() {
+            $('select[name="page_id"]').on('change', function() {
+                var pageId = $(this).val();
+                if (!pageId) return;
+
+                $.ajax({
+                    url: '{{ route("admin.menu-settings.page-actions.get-by-pageid") }}',
+                    type: 'GET',
+                    data: { page_id: pageId },
+                    success: function(data) {
+                        console.log('Page Actions loaded for page ' + pageId + ':', data);
+                    }
+                });
+            });
+        });
+    </script>
 @endpush
 @endsection
