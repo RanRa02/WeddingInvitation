@@ -48,13 +48,13 @@ class PageActionDatatable extends DataTable
     public function query(PageAction $model, Request $request)
     {
         $query = $model->newQuery()->with('page');
-        if ($request->name) {
+        if ($request->filled('name')) {
             $query->where(function ($q) use ($request) {
                 $q->where('name', 'like', '%'.$request->name.'%')
                   ->orWhere('name_kh', 'like', '%'.$request->name.'%');
             });
         }
-        if ($request->page_id) {
+        if ($request->filled('page_id')) {
             $query->where('page_id', $request->page_id);
         }
 
@@ -73,8 +73,8 @@ class PageActionDatatable extends DataTable
                     ->columns($this->getColumns())
                     ->ajax([
                         'data' => 'function(d) {
-                            d.name = $("#name").val();
-                            d.page_id = $("#page_id").val();
+                            d.name = $("#filter_name").val();
+                            d.page_id = $("#filter_page_id").val();
                         }'
                     ])
                     ->parameters([
@@ -87,7 +87,7 @@ class PageActionDatatable extends DataTable
                             });
                         }'
                     ])
-                    ->orderBy(0, 'ASC');
+                    ->orderBy(2, 'ASC');
     }
 
     /**

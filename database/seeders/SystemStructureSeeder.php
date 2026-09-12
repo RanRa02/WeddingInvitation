@@ -118,6 +118,11 @@ class SystemStructureSeeder extends Seeder
                 ]
             );
 
+            $guestModule = Module::updateOrCreate(
+                ['name' => 'Guest Management'],
+                ['name_kh' => 'គ្រប់គ្រងភ្ញៀវ', 'icon' => 'fa-id-card', 'sort_order' => 2, 'status' => 'active']
+            );
+
             $guestsPage = Page::updateOrCreate(
                 ['name' => 'Guest List'],
                 [

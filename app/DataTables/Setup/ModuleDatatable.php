@@ -44,13 +44,13 @@ class ModuleDatatable extends DataTable
     public function query(Module $model, Request $request)
     {
         $query = $model->newQuery();
-        if ($request->name) {
+        if ($request->filled('name')) {
             $query->where(function ($q) use ($request) {
                 $q->where('name', 'like', '%'.$request->name.'%')
                   ->orWhere('name_kh', 'like', '%'.$request->name.'%');
             });
         }
-        if ($request->status) {
+        if ($request->filled('status')) {
             $query->where('status', $request->status);
         }
 
@@ -69,8 +69,8 @@ class ModuleDatatable extends DataTable
                     ->columns($this->getColumns())
                     ->ajax([
                         'data' => 'function(d) {
-                            d.name = $("#name").val();
-                            d.status = $("#status").val();
+                            d.name = $("#filter_name").val();
+                            d.status = $("#filter_status").val();
                         }'
                     ])
                     ->parameters([
@@ -100,7 +100,7 @@ class ModuleDatatable extends DataTable
                             $(".dataTables_scrollHeadInner table thead, #moduledatatable thead").append(tr);
                         }'
                     ])
-                    ->orderBy(3, 'ASC');
+                    ->orderBy(1, 'ASC');
     }
 
     /**

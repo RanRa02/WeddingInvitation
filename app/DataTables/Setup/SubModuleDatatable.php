@@ -50,13 +50,13 @@ class SubModuleDatatable extends DataTable
     public function query(SubModule $model, Request $request)
     {
         $query = $model->newQuery()->with('module');
-        if ($request->name) {
+        if ($request->filled('name')) {
             $query->where(function ($q) use ($request) {
                 $q->where('name', 'like', '%'.$request->name.'%')
                   ->orWhere('name_kh', 'like', '%'.$request->name.'%');
             });
         }
-        if ($request->module_id) {
+        if ($request->filled('module_id')) {
             $query->where('module_id', $request->module_id);
         }
 
@@ -75,8 +75,8 @@ class SubModuleDatatable extends DataTable
                     ->columns($this->getColumns())
                     ->ajax([
                         'data' => 'function(d) {
-                            d.name = $("#name").val();
-                            d.module_id = $("#module_id").val();
+                            d.name = $("#filter_name").val();
+                            d.module_id = $("#filter_module_id").val();
                         }'
                     ])
                     ->parameters([
@@ -89,7 +89,7 @@ class SubModuleDatatable extends DataTable
                             });
                         }'
                     ])
-                    ->orderBy(3, 'ASC');
+                    ->orderBy(2, 'ASC');
     }
 
     /**
@@ -100,14 +100,14 @@ class SubModuleDatatable extends DataTable
     protected function getColumns()
     {
         return [
-            Column::computed('DT_RowIndex', __('app.no'))->width(40)->addClass('text-center'),
-            Column::computed('module_id')->title(__('app.parent_module')),
-            Column::make('name')->title(__('app.sub_module_name')),
-            Column::computed('icon')->title(__('app.icon'))->width(100)->addClass('text-center'),
-            Column::make('sort_order')->title(__('app.order'))->width(80)->addClass('text-center'),
-            Column::make('status')->title(__('app.status'))->width(90)->addClass('text-center'),
-            Column::computed('pages_count')->title(__('app.pages'))->width(90)->addClass('text-center'),
-            Column::computed('action', __('app.actions'))->exportable(false)->printable(false)->width(60)->addClass('text-end'),
+            Column::computed('DT_RowIndex', __('Nº'))->width(40)->addClass('text-center')->orderable(false)->searchable(false),
+            Column::make('module_id', 'modules.name')->title(__('Parent Module'))->orderable(false)->searchable(false),
+            Column::make('name')->title(__('Sub Module Name')),
+            Column::make('icon')->title(__('Icon'))->width(100)->addClass('text-center')->orderable(false)->searchable(false),
+            Column::make('sort_order')->title(__('Order'))->width(80)->addClass('text-center'),
+            Column::make('status')->title(__('Status'))->width(90)->addClass('text-center'),
+            Column::computed('pages_count')->title(__('Pages'))->width(90)->addClass('text-center')->orderable(false)->searchable(false),
+            Column::computed('action', __('Actions'))->exportable(false)->printable(false)->width(60)->addClass('text-end'),
         ];
     }
 
