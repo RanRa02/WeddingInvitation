@@ -64,7 +64,7 @@ class AdminAuthController extends Controller
         Auth::login($user);
         $request->session()->regenerate();
 
-        return redirect()->route('customer.dashboard')->with('success', 'បង្កើតគណនីអតិថិជនជោគជ័យ! (Account registered successfully!)');
+        return redirect()->route('customer.dashboard')->with('success', __('app.account_registered_successfully'));
     }
 
     public function login(Request $request)
@@ -79,18 +79,18 @@ class AdminAuthController extends Controller
         if ($user && $user->password === md5($credentials['password'])) {
             if ($user->status !== 'active') {
                 return back()->withErrors([
-                    'email' => 'គណនីរបស់អ្នកត្រូវបានផ្អាក (Account is inactive)',
+                    'email' => __('app.account_inactive'),
                 ])->onlyInput('email');
             }
 
             Auth::login($user, $request->boolean('remember'));
             $request->session()->regenerate();
 
-            return $this->redirectBasedOnRole($user)->with('success', 'ចូលប្រព័ន្ធជោគជ័យ! (Login Successful)');
+            return $this->redirectBasedOnRole($user)->with('success', __('app.login_successful'));
         }
 
         return back()->withErrors([
-            'email' => 'អ៊ីមែល ឬពាក្យសម្ងាត់មិនត្រឹមត្រូវ (Invalid email or password)',
+            'email' => __('app.invalid_credentials'),
         ])->onlyInput('email');
     }
 
@@ -100,7 +100,7 @@ class AdminAuthController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect()->route('login')->with('success', 'ចាកចេញពីប្រព័ន្ធជោគជ័យ (Logged out)');
+        return redirect()->route('login')->with('success', __('app.logout_successful'));
     }
 
     protected function redirectBasedOnRole($user)

@@ -1,7 +1,7 @@
 @extends('layouts.customer')
 
-@section('title', 'RSVP & Guest Reports')
-@section('page_title', 'របាយការណ៍វត្តមានភ្ញៀវ (RSVP & Attendance Analytics)')
+@section('title', __('app.rsvp_reports'))
+@section('page_title', __('app.rsvp_reports'))
 
 @section('content')
 <div class="row g-4 mb-4">

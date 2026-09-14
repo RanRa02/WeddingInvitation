@@ -84,7 +84,7 @@ class User extends Authenticatable
             return true;
         }
         // Fallback for default superadmin
-        return $this->id === 1 || str_contains(strtolower($this->email), 'admin');
+        return $this->id === 1 || ($this->email && str_contains(strtolower($this->email), 'admin'));
     }
 
     public function hasPermission($routeName, $action = 'can_view')

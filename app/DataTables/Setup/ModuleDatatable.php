@@ -21,18 +21,17 @@ class ModuleDatatable extends DataTable
             ->eloquent($query)
             ->addIndexColumn()
             ->editColumn('icon', function ($module) {
-                return '<span class="badge bg-light text-dark p-2 border"><i class="fas '.$module->icon.' me-1" style="color: #d8af65;"></i> '.$module->icon.'</span>';
+                $icon = $module->icon ?? 'fa-cubes';
+                $iconClass = str_starts_with($icon, 'fa-') ? 'fas ' . $icon : (str_contains($icon, 'fa') ? $icon : 'fas ' . $icon);
+                return '<div class="rounded-circle d-flex align-items-center justify-content-center mx-auto" style="width: 32px; height: 32px; background: rgba(24, 119, 242, 0.08); color: #1877f2; font-size: 15px;"><i class="'.$iconClass.'"></i></div>';
             })
             ->editColumn('status', function ($module) {
                 return $module->status === 'active'
-                    ? '<span class="badge bg-success bg-opacity-15 text-success rounded-pill px-3 py-1">Active</span>'
-                    : '<span class="badge bg-danger bg-opacity-15 text-danger rounded-pill px-3 py-1">Inactive</span>';
-            })
-            ->addColumn('pages_count', function ($module) {
-                return '<span class="badge bg-info bg-opacity-15 text-info rounded-pill px-3 py-1 fw-bold">'.$module->pages()->count().' Pages</span>';
+                    ? '<span class="badge rounded-pill px-3 py-1 fw-bold" style="background: rgba(40, 199, 111, 0.15) !important; color: #1e874b !important; border: 1px solid rgba(40, 199, 111, 0.3) !important; font-size: 11.5px;">Active</span>'
+                    : '<span class="badge rounded-pill px-3 py-1 fw-bold" style="background: rgba(234, 84, 85, 0.15) !important; color: #d63031 !important; border: 1px solid rgba(234, 84, 85, 0.3) !important; font-size: 11.5px;">Inactive</span>';
             })
             ->addColumn('action', 'admin.menu_settings.modules_action')
-            ->rawColumns(['icon', 'status', 'pages_count', 'action']);
+            ->rawColumns(['icon', 'status', 'action']);
     }
 
     /**
@@ -44,13 +43,13 @@ class ModuleDatatable extends DataTable
     public function query(Module $model, Request $request)
     {
         $query = $model->newQuery();
-        if ($request->filled('name')) {
+        if ($request->filled('name') && $request->name !== 'undefined') {
             $query->where(function ($q) use ($request) {
-                $q->where('name', 'like', '%'.$request->name.'%')
-                  ->orWhere('name_kh', 'like', '%'.$request->name.'%');
+                $q->where('name', 'ilike', '%'.$request->name.'%')
+                  ->orWhere('name_kh', 'ilike', '%'.$request->name.'%');
             });
         }
-        if ($request->filled('status')) {
+        if ($request->filled('status') && $request->status !== 'undefined') {
             $query->where('status', $request->status);
         }
 
@@ -67,38 +66,10 @@ class ModuleDatatable extends DataTable
         return $this->builder()
                     ->setTableId('moduledatatable')
                     ->columns($this->getColumns())
-                    ->ajax([
-                        'data' => 'function(d) {
-                            d.name = $("#filter_name").val();
-                            d.status = $("#filter_status").val();
-                        }'
-                    ])
+                    ->minifiedAjax()
                     ->parameters([
                         'dom' => 'Bfrtip',
                         'buttons' => ['excel', 'csv', 'print', 'pdf'],
-                        'initComplete' => 'function() {
-                            $("#filter").submit(function(event) {
-                                event.preventDefault();
-                                $("#moduledatatable").DataTable().ajax.reload();
-                            });
-                            var tr = document.createElement("tr");
-                            tr.className = "filter-row";
-                            var columns = this.api().init().columns;
-                            this.api().columns().every(function (index) {
-                                var column = this;
-                                var td = document.createElement("td");
-                                if (columns[index] && columns[index].searchable) {
-                                    var input = document.createElement("input");
-                                    input.className = "column-filter form-control form-control-sm";
-                                    input.dataset.col = index;
-                                    $(input).on("change keyup clear", function () {
-                                        column.search($(this).val(), false, false, true).draw();
-                                    }).appendTo(td);
-                                }
-                                $(td).appendTo(tr);
-                            });
-                            $(".dataTables_scrollHeadInner table thead, #moduledatatable thead").append(tr);
-                        }'
                     ])
                     ->orderBy(1, 'ASC');
     }
@@ -116,7 +87,6 @@ class ModuleDatatable extends DataTable
             Column::computed('icon')->title(__('app.icon'))->width(100)->addClass('text-center'),
             Column::make('sort_order')->title(__('app.order'))->width(80)->addClass('text-center'),
             Column::make('status')->title(__('app.status'))->width(90)->addClass('text-center'),
-            Column::computed('pages_count')->title(__('app.pages'))->width(90)->addClass('text-center'),
             Column::computed('action', __('app.actions'))->exportable(false)->printable(false)->width(60)->addClass('text-end'),
         ];
     }

@@ -21,6 +21,14 @@ use App\Http\Controllers\Customer\CustomerGuestController;
 */
 Route::get('/', [LandingController::class, 'index'])->name('home');
 
+// Global Language Switcher
+Route::get('/lang/{locale}', function ($locale) {
+    if (in_array($locale, ['kh', 'km', 'en'])) {
+        session(['admin_locale' => $locale]);
+    }
+    return redirect()->back();
+})->name('lang');
+
 // Direct Public Auth Shortcuts
 Route::get('/login', [AdminAuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AdminAuthController::class, 'login'])->name('login.submit');
@@ -73,7 +81,7 @@ Route::group([
 Route::group(['prefix' => 'admin', 'as' => 'admin.'], function () {
     // Language Switcher Route
     Route::get('/lang/{locale}', function ($locale) {
-        if (in_array($locale, ['kh', 'en'])) {
+        if (in_array($locale, ['kh', 'km', 'en'])) {
             session(['admin_locale' => $locale]);
         }
         return redirect()->back();
@@ -96,7 +104,9 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.'], function () {
         // User Roles Management
         Route::resource('roles', RoleController::class)->except(['show']);
 
-        // Subscription Plans Management
+        // Subscription Plans Management & Template Assignment
+        Route::get('/plans/templates', [PlanController::class, 'templatesIndex'])->name('plans.templates');
+        Route::post('/plans/templates/update', [PlanController::class, 'updateTemplates'])->name('plans.templates.update');
         Route::resource('plans', PlanController::class)->except(['show', 'create', 'edit']);
         
         // List Guest / RSVP Management

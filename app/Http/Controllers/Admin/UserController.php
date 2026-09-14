@@ -48,10 +48,10 @@ class UserController extends Controller
         User::create($validated);
 
         if ($request->input('action') === 'save_and_new') {
-            return redirect()->route('admin.users.create')->with('success', 'បង្កើតអ្នកប្រើប្រាស់ជោគជ័យ! (User created successfully)');
+            return redirect()->route('admin.users.create')->with('success', __('app.user_created_successfully'));
         }
 
-        return redirect()->route('admin.users.index')->with('success', 'បង្កើតអ្នកប្រើប្រាស់ជោគជ័យ! (User created successfully)');
+        return redirect()->route('admin.users.index')->with('success', __('app.user_created_successfully'));
     }
 
     public function update(Request $request, User $user)
@@ -75,17 +75,17 @@ class UserController extends Controller
 
         $user->update($validated);
 
-        return redirect()->route('admin.users.index')->with('success', 'កែប្រែទិន្នន័យជោគជ័យ! (User updated successfully)');
+        return redirect()->route('admin.users.index')->with('success', __('app.user_updated_successfully'));
     }
 
     public function destroy(User $user)
     {
         if ($user->id === auth()->id()) {
-            return redirect()->route('admin.users.index')->with('error', 'មិនអាចលុបគណនីដែលកំពុងប្រើប្រាស់បានទេ! (Cannot delete logged in account)');
+            return redirect()->route('admin.users.index')->with('error', __('app.cannot_delete_logged_in_user'));
         }
 
         $user->delete();
 
-        return redirect()->route('admin.users.index')->with('success', 'លុបអ្នកប្រើប្រាស់ជោគជ័យ! (User deleted successfully)');
+        return redirect()->route('admin.users.index')->with('success', __('app.user_deleted_successfully'));
     }
 }

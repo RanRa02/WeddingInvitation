@@ -3,47 +3,6 @@
 @section('title', __('Roles Setup'))
 
 @section('content')
-
-@if(session('success'))
-    <div class="alert alert-success alert-dismissible fade show rounded-3 shadow-sm border-0 mb-4" role="alert">
-        <i class="fas fa-check-circle me-2"></i> {{ session('success') }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-@endif
-
-<!-- Menu Settings Sub-Header Navigation Tabs -->
-<div class="card border-0 shadow-sm rounded-4 mb-4">
-    <div class="card-body p-3">
-        <ul class="nav nav-pills nav-fill gap-2">
-            <li class="nav-item">
-                <a class="nav-link fw-bold text-dark" href="{{ route('admin.menu-settings.modules.index') }}">
-                    <i class="fas fa-cubes me-1"></i> {{ __('Modules') }}
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link fw-bold text-dark" href="{{ route('admin.menu-settings.sub-modules.index') }}">
-                    <i class="fas fa-folder-open me-1"></i> {{ __('Sub-Modules') }}
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link fw-bold text-dark" href="{{ route('admin.menu-settings.pages.index') }}">
-                    <i class="fas fa-file-alt me-1"></i> {{ __('Pages') }}
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link fw-bold text-dark" href="{{ route('admin.menu-settings.page-actions.index') }}">
-                    <i class="fas fa-bolt me-1"></i> {{ __('Page Actions') }}
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link active fw-bold text-white shadow-sm" style="background-color: #1b2559;" href="{{ route('admin.menu-settings.roles.index') }}">
-                    <i class="fas fa-user-shield me-1"></i> {{ __('Roles Access') }}
-                </a>
-            </li>
-        </ul>
-    </div>
-</div>
-
 <div class="dreams-card p-0 overflow-hidden border-0 shadow-sm mb-4">
     <!-- Header & Action Buttons -->
     <div class="p-4 bg-white border-bottom d-flex flex-wrap align-items-center justify-content-between gap-3">

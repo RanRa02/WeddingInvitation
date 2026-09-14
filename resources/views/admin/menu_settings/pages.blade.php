@@ -3,87 +3,29 @@
 @section('title', __('Pages Setup'))
 
 @section('content')
-
-@if(session('success'))
-    <div class="alert alert-success alert-dismissible fade show rounded-3 shadow-sm border-0 mb-4" role="alert">
-        <i class="fas fa-check-circle me-2"></i> {{ session('success') }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-@endif
-
-@if(session('error'))
-    <div class="alert alert-danger alert-dismissible fade show rounded-3 shadow-sm border-0 mb-4" role="alert">
-        <i class="fas fa-exclamation-circle me-2"></i> {{ session('error') }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-@endif
-
-<!-- Menu Settings Sub-Header Navigation Tabs -->
-<div class="card border-0 shadow-sm rounded-4 mb-4">
-    <div class="card-body p-3">
-        <ul class="nav nav-pills nav-fill gap-2">
-            <li class="nav-item">
-                <a class="nav-link fw-bold text-dark" href="{{ route('admin.menu-settings.modules.index') }}">
-                    <i class="fas fa-cubes me-1"></i> {{ __('Modules') }}
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link fw-bold text-dark" href="{{ route('admin.menu-settings.sub-modules.index') }}">
-                    <i class="fas fa-folder-open me-1"></i> {{ __('Sub-Modules') }}
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link active fw-bold text-white shadow-sm" style="background-color: #1b2559;" href="{{ route('admin.menu-settings.pages.index') }}">
-                    <i class="fas fa-file-alt me-1"></i> {{ __('Pages') }}
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link fw-bold text-dark" href="{{ route('admin.menu-settings.page-actions.index') }}">
-                    <i class="fas fa-bolt me-1"></i> {{ __('Page Actions') }}
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link fw-bold text-dark" href="{{ route('admin.menu-settings.roles.index') }}">
-                    <i class="fas fa-user-shield me-1"></i> {{ __('Roles Access') }}
-                </a>
-            </li>
-        </ul>
-    </div>
-</div>
-
-<div class="card border-0 shadow-sm rounded-4 mb-4 overflow-hidden">
-    <!-- List of Pages Header Bar -->
-    <div class="card-header bg-white border-bottom border-primary py-3 px-4 d-flex align-items-center justify-content-between" style="border-top: 3px solid #1b2559 !important;">
-        <h5 class="card-title fw-bold text-dark mb-0">{{ __('List of Pages') }}</h5>
-        <div class="d-flex align-items-center gap-2">
-            <button class="btn btn-sm btn-link text-muted p-0" type="button" data-bs-toggle="collapse" data-bs-target="#pagesTableBody" aria-expanded="true">
-                <i class="fas fa-chevron-down"></i>
+<div class="dreams-card p-0 overflow-hidden border-0 shadow-sm">
+    <!-- Header & Action Buttons -->
+    <div class="p-4 bg-white border-bottom d-flex flex-wrap align-items-center justify-content-between gap-3">
+        <div>
+            <h4 class="dreams-card-title mb-1"><i class="fas fa-file-alt me-2" style="color: #1877f2;"></i> {{ __('Pages Setup') }}</h4>
+            <p class="text-muted small mb-0">Configure system menu pages, route names, URLs, icons, module and sub-module assignments.</p>
+        </div>
+        <div class="d-flex flex-wrap align-items-center gap-2">
+            <a href="{{ route('admin.menu-settings.pages.download-template') }}" class="btn btn-outline-secondary rounded-pill px-3">
+                <i class="fas fa-download me-1"></i> {{ __('Template') }}
+            </a>
+            <button type="button" class="btn btn-outline-primary rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#importPageModal">
+                <i class="fas fa-file-upload me-1"></i> {{ __('Import') }}
+            </button>
+            <button class="btn btn-warning text-white font-semibold rounded-pill px-4 shadow-sm" style="background: #ff9f43; border: none;" data-bs-toggle="modal" data-bs-target="#addPageModal">
+                <i class="fas fa-file-medical me-1"></i> {{ __('Add Page') }}
             </button>
         </div>
     </div>
-    
-    <!-- Table Body Container -->
-    <div id="pagesTableBody" class="collapse show p-3 bg-white">
-        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-3">
-            <div>
-                <p class="text-muted small mb-0">Configure system menu pages, route names, URLs, icons, module and sub-module assignments.</p>
-            </div>
-            <div class="d-flex flex-wrap align-items-center gap-2">
-                <a href="{{ route('admin.menu-settings.pages.download-template') }}" class="btn btn-outline-secondary rounded-pill px-3">
-                    <i class="fas fa-download me-1"></i> {{ __('Template') }}
-                </a>
-                <button type="button" class="btn btn-outline-primary rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#importPageModal">
-                    <i class="fas fa-file-upload me-1"></i> {{ __('Import') }}
-                </button>
-                <button class="btn btn-warning text-white font-semibold rounded-pill px-4 shadow-sm" style="background: #ff9f43; border: none;" data-bs-toggle="modal" data-bs-target="#addPageModal">
-                    <i class="fas fa-file-medical me-1"></i> {{ __('Add Page') }}
-                </button>
-            </div>
-        </div>
 
-        <div class="table-responsive">
-            {!! $dataTable->table(['class' => 'table table-gold-header yajra-datatable align-middle mb-0 w-100', 'style' => 'width:100%']) !!}
-        </div>
+    <!-- Gold Header Table List -->
+    <div class="table-responsive p-3">
+        {!! $dataTable->table(['class' => 'table table-gold-header yajra-datatable align-middle mb-0 w-100', 'style' => 'width:100%']) !!}
     </div>
 </div>
 

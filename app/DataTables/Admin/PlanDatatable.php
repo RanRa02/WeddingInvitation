@@ -25,7 +25,7 @@ class PlanDatatable extends DataTable
             })
             ->editColumn('guest_limit', function ($plan) {
                 return '<span class="badge bg-primary bg-opacity-15 text-primary fs-6 px-3 py-1 rounded-pill fw-bold">
-                    <i class="fas fa-users me-1"></i> '.number_format($plan->guest_limit).' នាក់
+                    <i class="fas fa-users me-1"></i> '.number_format($plan->guest_limit).' '.__('app.guests').'
                 </span>';
             })
             ->editColumn('price', function ($plan) {
@@ -42,12 +42,12 @@ class PlanDatatable extends DataTable
                     : '<span class="text-muted">0%</span>';
             })
             ->editColumn('duration_days', function ($plan) {
-                return $plan->duration_days.' ថ្ងៃ';
+                return $plan->duration_days.' '.__('app.days');
             })
             ->editColumn('is_active', function ($plan) {
                 return $plan->is_active
-                    ? '<span class="badge bg-success bg-opacity-15 text-success rounded-pill px-3 py-1">Active</span>'
-                    : '<span class="badge bg-secondary bg-opacity-15 text-secondary rounded-pill px-3 py-1">Inactive</span>';
+                    ? '<span class="badge bg-success bg-opacity-15 text-success rounded-pill px-3 py-1">'.__('app.active').'</span>'
+                    : '<span class="badge bg-secondary bg-opacity-15 text-secondary rounded-pill px-3 py-1">'.__('app.inactive').'</span>';
             })
             ->addColumn('action', 'admin.plans.action')
             ->rawColumns(['name', 'guest_limit', 'price', 'original_price', 'discount_percentage', 'is_active', 'action']);
@@ -62,8 +62,8 @@ class PlanDatatable extends DataTable
     public function query(SubscriptionPlan $model, Request $request)
     {
         $query = $model->newQuery();
-        if ($request->name) {
-            $query->where('name', 'like', '%'.$request->name.'%');
+        if ($request->filled('name') && $request->name !== 'undefined') {
+            $query->where('name', 'ilike', '%'.$request->name.'%');
         }
 
         return $query->select(['subscription_plans.*']);
@@ -79,20 +79,10 @@ class PlanDatatable extends DataTable
         return $this->builder()
                     ->setTableId('plandatatable')
                     ->columns($this->getColumns())
-                    ->ajax([
-                        'data' => 'function(d) {
-                            d.name = $("#name").val();
-                        }'
-                    ])
+                    ->minifiedAjax()
                     ->parameters([
                         'dom' => 'Bfrtip',
                         'buttons' => ['excel', 'csv', 'print', 'pdf'],
-                        'initComplete' => 'function() {
-                            $("#filter").submit(function(event) {
-                                event.preventDefault();
-                                $("#plandatatable").DataTable().ajax.reload();
-                            });
-                        }'
                     ]);
     }
 

@@ -310,7 +310,7 @@
         .dreams-menu-link {
             display: flex;
             align-items: center;
-            justify-content: space-between;
+            justify-content: flex-start;
             padding: 10px 16px;
             color: #5e5873;
             text-decoration: none;
@@ -349,6 +349,7 @@
 
         /* Role & Menu Setting Collapsible Dropdown (Matching User Screenshot) */
         .dreams-menu-link.parent-dropdown {
+            justify-content: space-between !important;
             background: var(--theme-primary-tint) !important;
             color: var(--theme-primary) !important;
             font-weight: 600;
@@ -686,36 +687,77 @@
             </a>
         </div>
 
+        @php
+            $sysLocale = app()->getLocale();
+            $sysPages = \App\Models\Page::all()->keyBy('route_name');
+            $sysModules = \App\Models\Module::all()->keyBy('id');
+            $roleMenuModule = \App\Models\Module::where('id', 4)->orWhere('name', 'like', '%Role%')->first();
+
+            $getPageName = function($routeName, $fallback) use ($sysPages, $sysLocale) {
+                if (isset($sysPages[$routeName])) {
+                    $p = $sysPages[$routeName];
+                    if (($sysLocale === 'kh' || $sysLocale === 'km') && !empty($p->name_kh)) {
+                        return $p->name_kh;
+                    }
+                    return !empty($p->name) ? $p->name : $fallback;
+                }
+                return __($fallback);
+            };
+
+            $getPageIcon = function($routeName, $fallback) use ($sysPages) {
+                if (isset($sysPages[$routeName]) && !empty($sysPages[$routeName]->icon)) {
+                    $icon = $sysPages[$routeName]->icon;
+                    return str_starts_with($icon, 'fa-') ? 'fas ' . $icon : (str_contains($icon, 'fa') ? $icon : 'fas ' . $icon);
+                }
+                return $fallback;
+            };
+
+            $getModuleName = function($moduleObj, $fallback) use ($sysLocale) {
+                if ($moduleObj) {
+                    if (($sysLocale === 'kh' || $sysLocale === 'km') && !empty($moduleObj->name_kh)) {
+                        return $moduleObj->name_kh;
+                    }
+                    return !empty($moduleObj->name) ? $moduleObj->name : $fallback;
+                }
+                return __($fallback);
+            };
+        @endphp
+
         <!-- Menu Navigation List -->
         <ul class="dreams-menu-list px-2 py-3">
             @if(auth()->check() && auth()->user()->isAdmin())
-                <li class="px-3 mb-2 text-muted fw-bold text-uppercase" style="font-size: 11px; letter-spacing: 0.5px;">Admin Management</li>
+                <li class="px-3 mb-2 text-muted fw-bold text-uppercase" style="font-size: 11px; letter-spacing: 0.5px;">{{ __('app.admin_management') }}</li>
                 
                 <li class="dreams-menu-item" data-type="page">
                     <a href="{{ route('admin.dashboard') }}" class="dreams-menu-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
-                        <div>
-                            <i class="fas fa-th-large menu-icon me-2"></i>
-                            <span>{{ __('Dashboard') }}</span>
+                        <div class="d-flex align-items-center">
+                            <i class="{{ $getPageIcon('admin.dashboard', 'fas fa-th-large') }} menu-icon me-2"></i>
+                            <span>{{ $getPageName('admin.dashboard', 'Dashboard') }}</span>
                         </div>
-                        <i class="fas fa-chevron-right chevron-right"></i>
                     </a>
                 </li>
                 <li class="dreams-menu-item" data-type="page">
                     <a href="{{ route('admin.guests.index') }}" class="dreams-menu-link {{ request()->routeIs('admin.guests.*') ? 'active' : '' }}">
-                        <div>
-                            <i class="fas fa-folder-open menu-icon me-2"></i>
-                            <span>{{ __('Guest List / Projects') }}</span>
+                        <div class="d-flex align-items-center">
+                            <i class="{{ $getPageIcon('admin.guests.index', 'fas fa-folder-open') }} menu-icon me-2"></i>
+                            <span>{{ $getPageName('admin.guests.index', 'Guest List / Projects') }}</span>
                         </div>
-                        <i class="fas fa-chevron-right chevron-right"></i>
                     </a>
                 </li>
                 <li class="dreams-menu-item" data-type="page">
-                    <a href="{{ route('admin.plans.index') }}" class="dreams-menu-link {{ request()->routeIs('admin.plans.*') ? 'active' : '' }}">
-                        <div>
-                            <i class="fas fa-tags text-warning menu-icon me-2"></i>
-                            <span>{{ __('Subscription Plans Management') }}</span>
+                    <a href="{{ route('admin.plans.index') }}" class="dreams-menu-link {{ request()->routeIs('admin.plans.index') ? 'active' : '' }}">
+                        <div class="d-flex align-items-center">
+                            <i class="{{ $getPageIcon('admin.plans.index', 'fas fa-tags text-warning') }} menu-icon me-2"></i>
+                            <span>{{ $getPageName('admin.plans.index', 'Subscription Plans Management') }}</span>
                         </div>
-                        <i class="fas fa-chevron-right chevron-right"></i>
+                    </a>
+                </li>
+                <li class="dreams-menu-item" data-type="page">
+                    <a href="{{ route('admin.plans.templates') }}" class="dreams-menu-link {{ request()->routeIs('admin.plans.templates') ? 'active' : '' }}">
+                        <div class="d-flex align-items-center">
+                            <i class="{{ $getPageIcon('admin.plans.templates', 'fas fa-layer-group text-primary') }} menu-icon me-2"></i>
+                            <span>{{ $getPageName('admin.plans.templates', 'Assign Plan Templates') }}</span>
+                        </div>
                     </a>
                 </li>
 
@@ -730,8 +772,8 @@
                        role="button" 
                        aria-expanded="{{ $isSettingActive ? 'true' : 'false' }}">
                         <div class="d-flex align-items-center">
-                            <i class="fas fa-cog menu-icon me-2" style="font-size: 16px;"></i>
-                            <span class="fw-bold">{{ __('Role and Menu Setting') }}</span>
+                            <i class="{{ $roleMenuModule && $roleMenuModule->icon ? (str_starts_with($roleMenuModule->icon, 'fa-') ? 'fas ' . $roleMenuModule->icon : $roleMenuModule->icon) : 'fas fa-cog' }} menu-icon me-2" style="font-size: 16px;"></i>
+                            <span class="fw-bold">{{ $getModuleName($roleMenuModule, 'Role and Menu Setting') }}</span>
                         </div>
                         <i class="fas fa-chevron-down chevron-right"></i>
                     </a>
@@ -741,29 +783,29 @@
                             <li class="mb-1" data-type="page">
                                 <a href="{{ route('admin.menu-settings.modules.index') }}" 
                                    class="submenu-item-link {{ request()->routeIs('admin.menu-settings.modules.*') ? 'active-sub' : '' }}">
-                                    <i class="fas fa-folder-plus text-primary"></i>
-                                    <span>{{ __('Modules Setup') }}</span>
+                                    <i class="{{ $getPageIcon('admin.menu-settings.modules.index', 'fas fa-folder-plus text-primary') }}"></i>
+                                    <span>{{ $getPageName('admin.menu-settings.modules.index', 'Modules Setup') }}</span>
                                 </a>
                             </li>
                             <li class="mb-1" data-type="page">
                                 <a href="{{ route('admin.menu-settings.pages.index') }}" 
                                    class="submenu-item-link {{ request()->routeIs('admin.menu-settings.pages.*') ? 'active-sub' : '' }}">
-                                    <i class="fas fa-file-contract text-primary"></i>
-                                    <span>{{ __('Pages Setup') }}</span>
+                                    <i class="{{ $getPageIcon('admin.menu-settings.pages.index', 'fas fa-file-contract text-primary') }}"></i>
+                                    <span>{{ $getPageName('admin.menu-settings.pages.index', 'Pages Setup') }}</span>
                                 </a>
                             </li>
                             <li class="mb-1" data-type="page">
                                 <a href="{{ route('admin.menu-settings.roles.index') }}" 
                                    class="submenu-item-link {{ request()->routeIs('admin.menu-settings.roles.*') ? 'active-sub' : '' }}">
-                                    <i class="fas fa-user-shield text-primary"></i>
-                                    <span>{{ __('Roles Setup') }}</span>
+                                    <i class="{{ $getPageIcon('admin.menu-settings.roles.index', 'fas fa-user-shield text-primary') }}"></i>
+                                    <span>{{ $getPageName('admin.menu-settings.roles.index', 'Roles Setup') }}</span>
                                 </a>
                             </li>
                             <li class="mb-1" data-type="page">
                                 <a href="{{ route('admin.users.index') }}" 
                                    class="submenu-item-link {{ request()->routeIs('admin.users.*') ? 'active-sub' : '' }}">
-                                    <i class="fas fa-user text-primary"></i>
-                                    <span>{{ __('Users Setup') }}</span>
+                                    <i class="{{ $getPageIcon('admin.users.index', 'fas fa-user text-primary') }}"></i>
+                                    <span>{{ $getPageName('admin.users.index', 'Users Setup') }}</span>
                                 </a>
                             </li>
                         </ul>
@@ -771,100 +813,90 @@
                 </li>
 
                 <!-- Customer System & Wedding Builder Section for Admin -->
-                <li class="px-3 mt-3 mb-2 text-muted fw-bold text-uppercase" style="font-size: 11px; letter-spacing: 0.5px;">Customer System & Builder</li>
+                <li class="px-3 mt-3 mb-2 text-muted fw-bold text-uppercase" style="font-size: 11px; letter-spacing: 0.5px;">{{ __('app.customer_system_builder') }}</li>
                 
                 <li class="dreams-menu-item" data-type="page">
                     <a href="{{ route('customer.dashboard') }}" class="dreams-menu-link {{ request()->routeIs('customer.dashboard') ? 'active' : '' }}">
-                        <div>
-                            <i class="fas fa-heart text-danger menu-icon me-2"></i>
-                            <span>{{ __('Customer Portal') }}</span>
+                        <div class="d-flex align-items-center">
+                            <i class="{{ $getPageIcon('customer.dashboard', 'fas fa-heart text-danger') }} menu-icon me-2"></i>
+                            <span>{{ $getPageName('customer.dashboard', 'Customer Portal') }}</span>
                         </div>
-                        <i class="fas fa-chevron-right chevron-right"></i>
                     </a>
                 </li>
                 <li class="dreams-menu-item" data-type="page">
                     <a href="{{ route('customer.wedding.create') }}" class="dreams-menu-link {{ request()->routeIs('customer.wedding.*') ? 'active' : '' }}">
-                        <div>
-                            <i class="fas fa-magic text-warning menu-icon me-2"></i>
-                            <span>{{ __('Wedding Builder & Templates') }}</span>
+                        <div class="d-flex align-items-center">
+                            <i class="{{ $getPageIcon('customer.wedding.create', 'fas fa-magic text-warning') }} menu-icon me-2"></i>
+                            <span>{{ $getPageName('customer.wedding.create', 'Wedding Builder & Templates') }}</span>
                         </div>
-                        <i class="fas fa-chevron-right chevron-right"></i>
                     </a>
                 </li>
                 <li class="dreams-menu-item" data-type="page">
                     <a href="{{ route('customer.subscriptions.plans') }}" class="dreams-menu-link {{ request()->routeIs('customer.subscriptions.*') ? 'active' : '' }}">
-                        <div>
-                            <i class="fas fa-credit-card text-info menu-icon me-2"></i>
-                            <span>{{ __('Subscription Plans') }}</span>
+                        <div class="d-flex align-items-center">
+                            <i class="{{ $getPageIcon('customer.subscriptions.plans', 'fas fa-credit-card text-info') }} menu-icon me-2"></i>
+                            <span>{{ $getPageName('customer.subscriptions.plans', 'Subscription Plans') }}</span>
                         </div>
-                        <i class="fas fa-chevron-right chevron-right"></i>
                     </a>
                 </li>
             @else
                 <!-- Customer Menu Functions (Exact Same Admin Layout, Different Functions) -->
-                <li class="px-3 mb-2 text-muted fw-bold text-uppercase" style="font-size: 11px; letter-spacing: 0.5px;">Customer Menu</li>
+                <li class="px-3 mb-2 text-muted fw-bold text-uppercase" style="font-size: 11px; letter-spacing: 0.5px;">{{ __('app.customer_menu') }}</li>
 
                 <li class="dreams-menu-item" data-type="page">
                     <a href="{{ route('customer.dashboard') }}" class="dreams-menu-link {{ request()->routeIs('customer.dashboard') ? 'active' : '' }}">
-                        <div>
+                        <div class="d-flex align-items-center">
                             <i class="fas fa-tachometer-alt menu-icon me-2 text-warning"></i>
-                            <span>{{ __('Dashboard (ផ្ទាំងដើម)') }}</span>
+                            <span>{{ __('app.dashboard') }}</span>
                         </div>
-                        <i class="fas fa-chevron-right chevron-right"></i>
                     </a>
                 </li>
                 <li class="dreams-menu-item" data-type="page">
                     <a href="{{ route('customer.subscriptions.plans') }}" class="dreams-menu-link {{ request()->routeIs('customer.subscriptions.*') ? 'active' : '' }}">
-                        <div>
+                        <div class="d-flex align-items-center">
                             <i class="fas fa-credit-card menu-icon me-2 text-info"></i>
-                            <span>{{ __('Subscription Plans (កញ្ចប់សេវា)') }}</span>
+                            <span>{{ __('app.subscription_plans') }}</span>
                         </div>
-                        <i class="fas fa-chevron-right chevron-right"></i>
                     </a>
                 </li>
                 <li class="dreams-menu-item" data-type="page">
                     <a href="{{ route('customer.wedding.create') }}" class="dreams-menu-link {{ request()->routeIs('customer.wedding.create') ? 'active' : '' }}">
-                        <div>
+                        <div class="d-flex align-items-center">
                             <i class="fas fa-heart menu-icon me-2 text-danger"></i>
-                            <span>{{ __('Wedding Details (ព័ត៌មានអាពាហ៍ពិពាហ៍)') }}</span>
+                            <span>{{ __('app.wedding_details') }}</span>
                         </div>
-                        <i class="fas fa-chevron-right chevron-right"></i>
                     </a>
                 </li>
                 <li class="dreams-menu-item" data-type="page">
                     <a href="{{ route('customer.wedding.template') }}" class="dreams-menu-link {{ request()->routeIs('customer.wedding.template') ? 'active' : '' }}">
-                        <div>
+                        <div class="d-flex align-items-center">
                             <i class="fas fa-paint-brush menu-icon me-2 text-success"></i>
-                            <span>{{ __('Select Template (ជ្រើសរើសទម្រង់)') }}</span>
+                            <span>{{ __('app.select_template') }}</span>
                         </div>
-                        <i class="fas fa-chevron-right chevron-right"></i>
                     </a>
                 </li>
                 <li class="dreams-menu-item" data-type="page">
                     <a href="{{ route('customer.guests.index') }}" class="dreams-menu-link {{ request()->routeIs('customer.guests.*') ? 'active' : '' }}">
-                        <div>
+                        <div class="d-flex align-items-center">
                             <i class="fas fa-users menu-icon me-2 text-primary"></i>
-                            <span>{{ __('Guest List (បញ្ជីភ្ញៀវ)') }}</span>
+                            <span>{{ __('app.guest_list') }}</span>
                         </div>
-                        <i class="fas fa-chevron-right chevron-right"></i>
                     </a>
                 </li>
                 <li class="dreams-menu-item" data-type="page">
                     <a href="{{ route('customer.invitations.send') }}" class="dreams-menu-link {{ request()->routeIs('customer.invitations.*') ? 'active' : '' }}">
-                        <div>
+                        <div class="d-flex align-items-center">
                             <i class="fas fa-paper-plane menu-icon me-2 text-warning"></i>
-                            <span>{{ __('Send Invitations (ផ្ញើសំបុត្រ)') }}</span>
+                            <span>{{ __('app.send_invitations') }}</span>
                         </div>
-                        <i class="fas fa-chevron-right chevron-right"></i>
                     </a>
                 </li>
                 <li class="dreams-menu-item" data-type="page">
                     <a href="{{ route('customer.reports.index') }}" class="dreams-menu-link {{ request()->routeIs('customer.reports.*') ? 'active' : '' }}">
-                        <div>
+                        <div class="d-flex align-items-center">
                             <i class="fas fa-chart-line menu-icon me-2 text-info"></i>
-                            <span>{{ __('RSVP Reports (របាយការណ៍)') }}</span>
+                            <span>{{ __('app.rsvp_reports') }}</span>
                         </div>
-                        <i class="fas fa-chevron-right chevron-right"></i>
                     </a>
                 </li>
             @endif
@@ -872,11 +904,10 @@
             <hr class="my-3 border-secondary opacity-10">
             <li class="dreams-menu-item" data-type="page">
                 <a href="{{ route('home') }}" target="_blank" class="dreams-menu-link text-muted">
-                    <div>
+                    <div class="d-flex align-items-center">
                         <i class="fas fa-external-link-alt menu-icon me-2"></i>
-                        <span>{{ __('Public Landing Site') }}</span>
+                        <span>{{ __('app.public_landing_site') }}</span>
                     </div>
-                    <i class="fas fa-chevron-right chevron-right"></i>
                 </a>
             </li>
         </ul>
@@ -893,7 +924,7 @@
                 </button>
                 <div class="d-none d-md-flex align-items-center gap-2 text-white small ms-2 opacity-75">
                     <i class="fas fa-search fs-6"></i>
-                    <span>{{ __('Search') }}...</span>
+                    <span>{{ __('app.search') }}...</span>
                 </div>
             </div>
 
@@ -971,6 +1002,13 @@
                 </div>
             @endif
 
+            @if(session('warning'))
+                <div class="alert alert-warning alert-dismissible fade show rounded-3 border-0 shadow-sm mb-4" role="alert">
+                    <i class="fas fa-exclamation-circle me-2"></i> {{ session('warning') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            @endif
+
             @yield('content')
         </main>
     </div>
@@ -991,6 +1029,15 @@
         if (window.jQuery && $.fn && $.fn.dataTable) {
             $.fn.dataTable.ext.errMode = 'none';
         }
+
+        // Auto-dismiss alert notifications after 2 seconds (2000ms)
+        $(document).ready(function() {
+            setTimeout(function() {
+                $('.alert.alert-dismissible').fadeTo(400, 0).slideUp(300, function() {
+                    $(this).remove();
+                });
+            }, 2000);
+        });
 
         $(document).ready(function() {
             $('.table-gold-header, .datatable').each(function() {

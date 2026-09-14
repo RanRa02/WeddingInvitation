@@ -21,8 +21,9 @@ class UserDatatable extends DataTable
             ->eloquent($query)
             ->addIndexColumn()
             ->editColumn('photo', function ($user) {
+                $initial = mb_strtoupper(mb_substr($user->name ?? 'U', 0, 1, 'UTF-8'), 'UTF-8');
                 return '<div class="rounded-circle bg-warning text-white fw-bold d-flex align-items-center justify-content-center mx-auto" style="width: 32px; height: 32px; font-size: 13px; background: #ff9f43 !important;">
-                    '.strtoupper(substr($user->name, 0, 1)).'
+                    '.$initial.'
                 </div>';
             })
             ->editColumn('user_code', function ($user) {
@@ -42,8 +43,8 @@ class UserDatatable extends DataTable
             })
             ->editColumn('status', function ($user) {
                 return $user->status === 'active'
-                    ? '<span class="badge bg-success bg-opacity-15 text-success rounded-pill px-3 py-1">Active</span>'
-                    : '<span class="badge bg-danger bg-opacity-15 text-danger rounded-pill px-3 py-1">Inactive</span>';
+                    ? '<span class="badge rounded-pill px-3 py-1 fw-bold" style="background: rgba(40, 199, 111, 0.15) !important; color: #1e874b !important; border: 1px solid rgba(40, 199, 111, 0.3) !important; font-size: 11.5px;">Active</span>'
+                    : '<span class="badge rounded-pill px-3 py-1 fw-bold" style="background: rgba(234, 84, 85, 0.15) !important; color: #d63031 !important; border: 1px solid rgba(234, 84, 85, 0.3) !important; font-size: 11.5px;">Inactive</span>';
             })
             ->editColumn('created_at', function ($user) {
                 return $user->created_at ? $user->created_at->format('d/m/Y H:i') : '-';
@@ -61,13 +62,13 @@ class UserDatatable extends DataTable
     public function query(User $model, Request $request)
     {
         $query = $model->newQuery()->with('role');
-        if ($request->name) {
+        if ($request->filled('name') && $request->name !== 'undefined') {
             $query->where(function ($q) use ($request) {
-                $q->where('name', 'like', '%'.$request->name.'%')
-                  ->orWhere('email', 'like', '%'.$request->name.'%');
+                $q->where('name', 'ilike', '%'.$request->name.'%')
+                  ->orWhere('email', 'ilike', '%'.$request->name.'%');
             });
         }
-        if ($request->status) {
+        if ($request->filled('status') && $request->status !== 'undefined') {
             $query->where('status', $request->status);
         }
 
@@ -84,21 +85,10 @@ class UserDatatable extends DataTable
         return $this->builder()
                     ->setTableId('userdatatable')
                     ->columns($this->getColumns())
-                    ->ajax([
-                        'data' => 'function(d) {
-                            d.name = $("#name").val();
-                            d.status = $("#status").val();
-                        }'
-                    ])
+                    ->minifiedAjax()
                     ->parameters([
                         'dom' => 'Bfrtip',
                         'buttons' => ['excel', 'csv', 'print', 'pdf'],
-                        'initComplete' => 'function() {
-                            $("#filter").submit(function(event) {
-                                event.preventDefault();
-                                $("#userdatatable").DataTable().ajax.reload();
-                            });
-                        }'
                     ]);
     }
 

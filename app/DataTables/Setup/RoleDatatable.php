@@ -47,8 +47,8 @@ class RoleDatatable extends DataTable
     public function query(Role $model, Request $request)
     {
         $query = $model->newQuery()->withCount('users');
-        if ($request->filled('name')) {
-            $query->where('name', 'like', '%'.$request->name.'%');
+        if ($request->filled('name') && $request->name !== 'undefined') {
+            $query->where('name', 'ilike', '%'.$request->name.'%');
         }
 
         return $query->select(['roles.*']);
@@ -64,20 +64,10 @@ class RoleDatatable extends DataTable
         return $this->builder()
                     ->setTableId('roledatatable')
                     ->columns($this->getColumns())
-                    ->ajax([
-                        'data' => 'function(d) {
-                            d.name = $("#filter_name").val();
-                        }'
-                    ])
+                    ->minifiedAjax()
                     ->parameters([
                         'dom' => 'Bfrtip',
                         'buttons' => ['excel', 'csv', 'print', 'pdf'],
-                        'initComplete' => 'function() {
-                            $("#filter").submit(function(event) {
-                                event.preventDefault();
-                                $("#roledatatable").DataTable().ajax.reload();
-                            });
-                        }'
                     ])
                     ->orderBy(2, 'ASC');
     }

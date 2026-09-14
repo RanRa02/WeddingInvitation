@@ -44,10 +44,10 @@ class RoleController extends Controller
         Role::create($validated);
 
         if ($request->input('action') === 'save_and_new') {
-            return redirect()->route('admin.roles.create')->with('success', 'បង្កើតតួនាទីជោគជ័យ! (Role created successfully)');
+            return redirect()->route('admin.roles.create')->with('success', __('app.role_created_successfully'));
         }
 
-        return redirect()->route('admin.roles.index')->with('success', 'បង្កើតតួនាទីជោគជ័យ! (Role created successfully)');
+        return redirect()->route('admin.roles.index')->with('success', __('app.role_created_successfully'));
     }
 
     public function update(Request $request, Role $role)
@@ -62,17 +62,17 @@ class RoleController extends Controller
 
         $role->update($validated);
 
-        return redirect()->route('admin.roles.index')->with('success', 'កែប្រែតួនាទីជោគជ័យ! (Role updated successfully)');
+        return redirect()->route('admin.roles.index')->with('success', __('app.role_updated_successfully'));
     }
 
     public function destroy(Role $role)
     {
         if ($role->users()->count() > 0) {
-            return redirect()->route('admin.roles.index')->with('error', 'មិនអាចលុបតួនាទីនេះបានទេ ព្រោះមានអ្នកប្រើប្រាស់កំពុងកាន់តួនាទីនេះ! (Cannot delete role assigned to users)');
+            return redirect()->route('admin.roles.index')->with('error', __('app.cannot_delete_role_in_use'));
         }
 
         $role->delete();
 
-        return redirect()->route('admin.roles.index')->with('success', 'លុបតួនាទីជោគជ័យ! (Role deleted successfully)');
+        return redirect()->route('admin.roles.index')->with('success', __('app.role_deleted_successfully'));
     }
 }

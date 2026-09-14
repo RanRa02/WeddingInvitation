@@ -27,7 +27,7 @@ class CustomerGuestController extends Controller
         $user = Auth::user();
 
         if ($user->hasReachedGuestLimit()) {
-            return back()->with('error', 'អ្នកបានប្រើប្រាស់ចំនួនភ្ញៀវដល់កម្រិតកំណត់កញ្ចប់សេវាកម្មហើយ! សូម Upgrade កញ្ចប់សេវាកម្ម (Guest limit reached!)');
+            return back()->with('error', __('app.guest_limit_reached'));
         }
 
         $validated = $request->validate([
@@ -45,7 +45,7 @@ class CustomerGuestController extends Controller
 
         Guest::create($validated);
 
-        return back()->with('success', 'បន្ថែមភ្ញៀវកិត្តិយសជោគជ័យ! (Guest added successfully)');
+        return back()->with('success', __('app.guest_added_successfully'));
     }
 
     public function update(Request $request, $id)
@@ -65,7 +65,7 @@ class CustomerGuestController extends Controller
 
         $guest->update($validated);
 
-        return back()->with('success', 'កែប្រែព័ត៌មានភ្ញៀវជោគជ័យ! (Guest updated successfully)');
+        return back()->with('success', __('app.guest_updated_successfully'));
     }
 
     public function destroy($id)
@@ -73,7 +73,7 @@ class CustomerGuestController extends Controller
         $guest = Guest::where('user_id', Auth::id())->findOrFail($id);
         $guest->delete();
 
-        return back()->with('success', 'លុបភ្ញៀវជោគជ័យ! (Guest deleted successfully)');
+        return back()->with('success', __('app.guest_deleted_successfully'));
     }
 
     public function send()

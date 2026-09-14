@@ -978,9 +978,39 @@
         <div class="equalizer-bar"></div>
     </div>
 </div>
-<audio id="weddingAudio" loop preload="none">
-    <source src="{{ asset('assets/audio/wedding-march.mp3') }}" type="audio/mpeg">
-</audio>
+@php
+    $isYoutube = false;
+    $youtubeId = '';
+    $musicUrl = $wedding->music_url ?? '';
+
+    if (!empty($musicUrl)) {
+        if (preg_match('/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/|youtube\.com\/shorts\/)([a-zA-Z0-9_-]{11})/', $musicUrl, $matches)) {
+            $isYoutube = true;
+            $youtubeId = $matches[1];
+        }
+    }
+
+    $audioSource = asset('assets/audio/wedding-march.mp3');
+    if (!$isYoutube && !empty($musicUrl)) {
+        if (\Illuminate\Support\Str::startsWith($musicUrl, ['http://', 'https://'])) {
+            $audioSource = $musicUrl;
+        } else {
+            $audioSource = asset($musicUrl);
+        }
+    }
+@endphp
+
+@if($isYoutube)
+    <!-- YouTube Background Audio Player -->
+    <div id="ytPlayerWrapper" style="position: fixed; width: 1px; height: 1px; bottom: 0; left: 0; opacity: 0.01; pointer-events: none; z-index: -999;">
+        <div id="youtubePlayer"></div>
+    </div>
+    <script src="https://www.youtube.com/iframe_api"></script>
+@else
+    <audio id="weddingAudio" loop preload="none">
+        <source src="{{ $audioSource }}" type="audio/mpeg">
+    </audio>
+@endif
 
 <div class="container px-2 px-md-4 my-3 main-container">
 
@@ -1822,23 +1852,84 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Audio & Envelope
+    // Audio & Envelope Handling (HTML5 Audio & YouTube Support)
     const audio = document.getElementById('weddingAudio');
     const musicWidget = document.getElementById('musicWidget');
     const musicBtn = document.getElementById('musicToggleBtn');
     const musicIcon = document.getElementById('musicIcon');
     const envelopeOverlay = document.getElementById('envelopeOverlay');
     const btnOpenEnvelope = document.getElementById('btnOpenEnvelope');
+    const isYoutube = {{ $isYoutube ? 'true' : 'false' }};
+    const youtubeId = '{{ $youtubeId }}';
+    let ytPlayer = null;
+    let ytReady = false;
     let isPlaying = false;
 
+    if (isYoutube && youtubeId) {
+        window.onYouTubeIframeAPIReady = function() {
+            ytPlayer = new YT.Player('youtubePlayer', {
+                height: '1',
+                width: '1',
+                videoId: youtubeId,
+                playerVars: {
+                    'autoplay': 0,
+                    'loop': 1,
+                    'playlist': youtubeId,
+                    'controls': 0,
+                    'showinfo': 0,
+                    'rel': 0,
+                    'modestbranding': 1,
+                    'playsinline': 1,
+                    'enablejsapi': 1
+                },
+                events: {
+                    'onReady': function(event) {
+                        ytReady = true;
+                    },
+                    'onStateChange': function(event) {
+                        if (event.data === YT.PlayerState.PLAYING) {
+                            isPlaying = true;
+                            if (musicWidget) musicWidget.classList.add('playing');
+                            if (musicIcon) musicIcon.className = 'fas fa-pause';
+                        } else if (event.data === YT.PlayerState.PAUSED || event.data === YT.PlayerState.ENDED) {
+                            isPlaying = false;
+                            if (musicWidget) musicWidget.classList.remove('playing');
+                            if (musicIcon) musicIcon.className = 'fas fa-music';
+                        }
+                    }
+                }
+            });
+        };
+    }
+
     function playAudio() {
-        if (audio) {
+        if (isYoutube && ytPlayer && typeof ytPlayer.playVideo === 'function') {
+            try {
+                ytPlayer.playVideo();
+                isPlaying = true;
+                if (musicWidget) musicWidget.classList.add('playing');
+                if (musicIcon) musicIcon.className = 'fas fa-pause';
+            } catch(e) { console.log('YT play error:', e); }
+        } else if (audio) {
             audio.play().then(() => {
                 isPlaying = true;
                 if (musicWidget) musicWidget.classList.add('playing');
                 if (musicIcon) musicIcon.className = 'fas fa-pause';
             }).catch(err => console.log('Audio error:', err));
         }
+    }
+
+    function pauseAudio() {
+        if (isYoutube && ytPlayer && typeof ytPlayer.pauseVideo === 'function') {
+            try {
+                ytPlayer.pauseVideo();
+            } catch(e) {}
+        } else if (audio) {
+            audio.pause();
+        }
+        isPlaying = false;
+        if (musicWidget) musicWidget.classList.remove('playing');
+        if (musicIcon) musicIcon.className = 'fas fa-music';
     }
 
     function handleOpenEnvelope() {
@@ -1860,18 +1951,36 @@ document.addEventListener('DOMContentLoaded', function () {
         btnOpenEnvelope.addEventListener('click', handleOpenEnvelope);
     }
 
-    if (musicBtn && audio) {
+    if (musicBtn) {
         musicBtn.addEventListener('click', function () {
             if (isPlaying) {
-                audio.pause();
-                if (musicWidget) musicWidget.classList.remove('playing');
-                if (musicIcon) musicIcon.className = 'fas fa-music';
+                pauseAudio();
             } else {
                 playAudio();
             }
-            isPlaying = !isPlaying;
         });
     }
+
+    // Auto pause audio when browser tab is closed, hidden, or page is unloaded
+    function stopOrPauseAudio() {
+        if (isPlaying) {
+            pauseAudio();
+        }
+    }
+
+    document.addEventListener('visibilitychange', function () {
+        if (document.hidden) {
+            stopOrPauseAudio();
+        }
+    });
+
+    window.addEventListener('pagehide', function () {
+        stopOrPauseAudio();
+    });
+
+    window.addEventListener('beforeunload', function () {
+        stopOrPauseAudio();
+    });
 
     // Live Countdown Timer
     const weddingTargetDate = new Date("April 11, 2027 09:00:00").getTime();

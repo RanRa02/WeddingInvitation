@@ -1,7 +1,7 @@
 @extends('layouts.customer')
 
-@section('title', 'Guest List Management')
-@section('page_title', 'គ្រប់គ្រងបញ្ជីភ្ញៀវ (Guest List Management)')
+@section('title', __('app.guest_list'))
+@section('page_title', __('app.guest_list'))
 
 @section('content')
 <div class="row g-4">

@@ -21,21 +21,23 @@ class PageDatatable extends DataTable
             ->eloquent($query)
             ->addIndexColumn()
             ->editColumn('icon', function ($page) {
-                return '<i class="fas '.($page->icon ?? 'fa-file-alt').'"></i>';
+                $icon = $page->icon ?? 'fa-file-alt';
+                $iconClass = str_starts_with($icon, 'fa-') ? 'fas ' . $icon : (str_contains($icon, 'fa') ? $icon : 'fas ' . $icon);
+                return '<div class="rounded-circle d-flex align-items-center justify-content-center mx-auto" style="width: 32px; height: 32px; background: rgba(24, 119, 242, 0.08); color: #1877f2; font-size: 15px;"><i class="'.$iconClass.'"></i></div>';
             })
             ->editColumn('module_id', function ($page) {
-                return $page->module_name ? $page->module_name : 'N/A';
+                return $page->module_name ? '<span class="badge bg-warning bg-opacity-10 text-dark border px-2 py-1">'.$page->module_name.'</span>' : '<span class="text-muted">N/A</span>';
             })
             ->editColumn('sub_module_id', function ($page) {
-                return $page->sub_module_name ? $page->sub_module_name : 'N/A';
+                return $page->sub_module_name ? '<span class="badge bg-info bg-opacity-10 text-info border px-2 py-1">'.$page->sub_module_name.'</span>' : '<span class="text-muted">N/A</span>';
             })
-            ->editColumn('is_border_bottom', function ($page) {
-                return $page->is_border_bottom 
-                    ? '<span class="badge bg-danger text-white rounded-1 px-2 py-1">No</span>' 
-                    : '<span class="badge bg-danger text-white rounded-1 px-2 py-1">No</span>';
+            ->editColumn('status', function ($page) {
+                return $page->status === 'active'
+                    ? '<span class="badge rounded-pill px-3 py-1 fw-bold" style="background: rgba(40, 199, 111, 0.15) !important; color: #1e874b !important; border: 1px solid rgba(40, 199, 111, 0.3) !important; font-size: 11.5px;">Active</span>'
+                    : '<span class="badge rounded-pill px-3 py-1 fw-bold" style="background: rgba(234, 84, 85, 0.15) !important; color: #d63031 !important; border: 1px solid rgba(234, 84, 85, 0.3) !important; font-size: 11.5px;">Inactive</span>';
             })
             ->addColumn('action', 'admin.menu_settings.pages_action')
-            ->rawColumns(['icon', 'module_id', 'sub_module_id', 'is_border_bottom', 'action']);
+            ->rawColumns(['icon', 'module_id', 'sub_module_id', 'status', 'action']);
     }
 
     /**
@@ -51,26 +53,26 @@ class PageDatatable extends DataTable
             ->leftJoin('sub_modules', 'pages.sub_module_id', 'sub_modules.id')
             ->leftJoin('modules AS second_modules', 'sub_modules.module_id', 'second_modules.id');
 
-        if ($request->filled('module_id')) {
+        if ($request->filled('module_id') && $request->module_id !== 'undefined') {
             $query->where(function ($q) use ($request) {
                 $q->orWhere('pages.module_id', $request->module_id)
                   ->orWhere('sub_modules.module_id', $request->module_id);
             });
         }
-        if ($request->filled('sub_module_id')) {
+        if ($request->filled('sub_module_id') && $request->sub_module_id !== 'undefined') {
             $query->where(function ($q) use ($request) {
                 $q->orWhere('pages.sub_module_id', $request->sub_module_id)
                   ->orWhere('sub_modules.id', $request->sub_module_id);
             });
         }
-        if ($request->filled('name')) {
+        if ($request->filled('name') && $request->name !== 'undefined') {
             $query->where(function ($q) use ($request) {
-                $q->orWhere('pages.name', 'like', '%'.$request->name.'%')
-                  ->orWhere('pages.name_kh', 'like', '%'.$request->name.'%');
+                $q->orWhere('pages.name', 'ilike', '%'.$request->name.'%')
+                  ->orWhere('pages.name_kh', 'ilike', '%'.$request->name.'%');
             });
         }
 
-        return $query->selectRaw("pages.id, pages.icon, pages.name, pages.name_kh, pages.is_border_bottom, pages.sort_order,
+        return $query->selectRaw("pages.id, pages.icon, pages.name, pages.name_kh, pages.status, pages.sort_order,
                 CASE
                     WHEN modules.name IS NOT NULL THEN modules.name
                     ELSE second_modules.name
@@ -88,39 +90,10 @@ class PageDatatable extends DataTable
         return $this->builder()
                     ->setTableId('pagedatatable')
                     ->columns($this->getColumns())
-                    ->ajax([
-                        'data' => 'function(d) {
-                            d.name = $("#filter_name").val();
-                            d.module_id = $("#filter_module_id").val();
-                            d.sub_module_id = $("#filter_sub_module_id").val();
-                        }'
-                    ])
+                    ->minifiedAjax()
                     ->parameters([
                         'dom' => 'Bfrtip',
                         'buttons' => ['excel', 'csv', 'print', 'pdf'],
-                        'initComplete' => 'function() {
-                            $("#filter").submit(function(event) {
-                                event.preventDefault();
-                                $("#pagedatatable").DataTable().ajax.reload();
-                            });
-                            var tr = document.createElement("tr");
-                            tr.className = "filter-row";
-                            var columns = this.api().init().columns;
-                            this.api().columns().every(function (index) {
-                                var column = this;
-                                var td = document.createElement("td");
-                                if (columns[index] && columns[index].searchable) {
-                                    var input = document.createElement("input");
-                                    input.className = "column-filter form-control form-control-sm";
-                                    input.dataset.col = index;
-                                    $(input).on("change keyup clear", function () {
-                                        column.search($(this).val(), false, false, true).draw();
-                                    }).appendTo(td);
-                                }
-                                $(td).appendTo(tr);
-                            });
-                            $("#pagedatatable thead").append(tr);
-                        }'
                     ])
                     ->orderBy(6, 'ASC');
     }
@@ -134,13 +107,13 @@ class PageDatatable extends DataTable
     {
         return [
             Column::computed('DT_RowIndex', __('Nº'))->width(40)->addClass('text-center'),
-            Column::make('icon')->title(__('Icon'))->width(50)->addClass('text-center')->orderable(false)->searchable(false),
+            Column::make('icon')->title(__('Icon'))->width(100)->addClass('text-center')->orderable(false)->searchable(false),
             Column::make('name')->title(__('Page Name')),
             Column::make('name_kh')->title(__('Page Name (KH)')),
             Column::make('module_id', 'modules.name')->title(__('Module Name'))->orderable(false)->searchable(false),
             Column::make('sub_module_id', 'sub_modules.name')->title(__('Sub Module Name'))->orderable(false)->searchable(false),
             Column::make('sort_order')->title(__('Order'))->width(80)->addClass('text-center'),
-            Column::make('is_border_bottom')->title(__('Border Bottom'))->width(90)->addClass('text-center')->orderable(false)->searchable(false),
+            Column::make('status')->title(__('Status'))->width(90)->addClass('text-center'),
             Column::computed('action', __('Action'))->exportable(false)->printable(false)->width(60)->addClass('text-end'),
         ];
     }

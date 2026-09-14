@@ -50,11 +50,11 @@ class GuestController extends Controller
     {
         $user = auth()->user();
         if (!$user->canCreateOnPage('admin.guests.index')) {
-            abort(403, 'លោកអ្នកគ្មានសិទ្ធិបន្ថែមទិន្នន័យទេ (Unauthorized action)');
+            abort(403, __('app.unauthorized_action'));
         }
 
         if ($user->hasReachedGuestLimit()) {
-            return redirect()->route('admin.guests.index')->with('error', "លោកអ្នកបានដល់កម្រិតកំណត់ភ្ញៀវចំនួន {$user->guest_limit} នាក់ហើយ។ សូមទាក់ទង Administrator ដើម្បីបង្កើនចំនួនភ្ញៀវ! (Reached guest limit of {$user->guest_limit})");
+            return redirect()->route('admin.guests.index')->with('error', __('app.guest_limit_reached_with_count', ['limit' => $user->guest_limit]));
         }
 
         return view('admin.guests.create');
@@ -64,7 +64,7 @@ class GuestController extends Controller
     {
         $user = auth()->user();
         if (!$user->canEditOnPage('admin.guests.index') || (!$user->isAdmin() && $guest->user_id !== $user->id)) {
-            abort(403, 'លោកអ្នកគ្មានសិទ្ធិកែប្រែទិន្នន័យនេះទេ (Unauthorized action)');
+            abort(403, __('app.unauthorized_action'));
         }
 
         return view('admin.guests.edit', compact('guest'));
@@ -74,11 +74,11 @@ class GuestController extends Controller
     {
         $user = auth()->user();
         if (!$user->canCreateOnPage('admin.guests.index')) {
-            abort(403, 'លោកអ្នកគ្មានសិទ្ធិបន្ថែមទិន្នន័យទេ (Unauthorized action)');
+            abort(403, __('app.unauthorized_action'));
         }
 
         if ($user->hasReachedGuestLimit()) {
-            return redirect()->route('admin.guests.index')->with('error', "លោកអ្នកបានដល់កម្រិតកំណត់ភ្ញៀវចំនួន {$user->guest_limit} នាក់ហើយ! (Reached guest limit)");
+            return redirect()->route('admin.guests.index')->with('error', __('app.guest_limit_reached_with_count', ['limit' => $user->guest_limit]));
         }
 
         $validated = $request->validate([
@@ -99,17 +99,17 @@ class GuestController extends Controller
         Guest::create($validated);
 
         if ($request->input('action') === 'save_and_new') {
-            return redirect()->route('admin.guests.create')->with('success', 'បន្ថែមភ្ញៀវកិត្តិយសជោគជ័យ! (Guest added successfully)');
+            return redirect()->route('admin.guests.create')->with('success', __('app.guest_added_successfully'));
         }
 
-        return redirect()->route('admin.guests.index')->with('success', 'បន្ថែមភ្ញៀវកិត្តិយសជោគជ័យ! (Guest added successfully)');
+        return redirect()->route('admin.guests.index')->with('success', __('app.guest_added_successfully'));
     }
 
     public function update(Request $request, Guest $guest)
     {
         $user = auth()->user();
         if (!$user->canEditOnPage('admin.guests.index') || (!$user->isAdmin() && $guest->user_id !== $user->id)) {
-            abort(403, 'លោកអ្នកគ្មានសិទ្ធិកែប្រែទិន្នន័យនេះទេ (Unauthorized action)');
+            abort(403, __('app.unauthorized_action'));
         }
 
         $validated = $request->validate([
@@ -126,18 +126,18 @@ class GuestController extends Controller
 
         $guest->update($validated);
 
-        return redirect()->route('admin.guests.index')->with('success', 'កែប្រែព័ត៌មានភ្ញៀវជោគជ័យ! (Guest updated successfully)');
+        return redirect()->route('admin.guests.index')->with('success', __('app.guest_updated_successfully'));
     }
 
     public function destroy(Guest $guest)
     {
         $user = auth()->user();
         if (!$user->canDeleteOnPage('admin.guests.index') || (!$user->isAdmin() && $guest->user_id !== $user->id)) {
-            abort(403, 'លោកអ្នកគ្មានសិទ្ធិលុបទិន្នន័យនេះទេ (Unauthorized action)');
+            abort(403, __('app.unauthorized_action'));
         }
 
         $guest->delete();
 
-        return redirect()->route('admin.guests.index')->with('success', 'លុបភ្ញៀវជោគជ័យ! (Guest deleted successfully)');
+        return redirect()->route('admin.guests.index')->with('success', __('app.guest_deleted_successfully'));
     }
 }

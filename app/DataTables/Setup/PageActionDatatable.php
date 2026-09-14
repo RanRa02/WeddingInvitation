@@ -33,7 +33,9 @@ class PageActionDatatable extends DataTable
                 return '<span class="badge bg-secondary bg-opacity-15 text-dark rounded-pill px-3 py-1">'.$action->position.'</span>';
             })
             ->editColumn('icon', function ($action) {
-                return '<span class="badge bg-light text-dark p-2 border"><i class="fas '.($action->icon ?? 'fa-bolt').' me-1"></i> '.($action->icon ?? 'fa-bolt').'</span>';
+                $icon = $action->icon ?? 'fa-bolt';
+                $iconClass = str_starts_with($icon, 'fa-') ? 'fas ' . $icon : (str_contains($icon, 'fa') ? $icon : 'fas ' . $icon);
+                return '<div class="rounded-circle d-flex align-items-center justify-content-center mx-auto" style="width: 32px; height: 32px; background: rgba(24, 119, 242, 0.08); color: #1877f2; font-size: 15px;"><i class="'.$iconClass.'"></i></div>';
             })
             ->addColumn('action', 'admin.menu_settings.page_actions_action')
             ->rawColumns(['page_id', 'type', 'position', 'icon', 'action']);
@@ -48,13 +50,13 @@ class PageActionDatatable extends DataTable
     public function query(PageAction $model, Request $request)
     {
         $query = $model->newQuery()->with('page');
-        if ($request->filled('name')) {
+        if ($request->filled('name') && $request->name !== 'undefined') {
             $query->where(function ($q) use ($request) {
-                $q->where('name', 'like', '%'.$request->name.'%')
-                  ->orWhere('name_kh', 'like', '%'.$request->name.'%');
+                $q->where('name', 'ilike', '%'.$request->name.'%')
+                  ->orWhere('name_kh', 'ilike', '%'.$request->name.'%');
             });
         }
-        if ($request->filled('page_id')) {
+        if ($request->filled('page_id') && $request->page_id !== 'undefined') {
             $query->where('page_id', $request->page_id);
         }
 
@@ -71,21 +73,10 @@ class PageActionDatatable extends DataTable
         return $this->builder()
                     ->setTableId('pageactiondatatable')
                     ->columns($this->getColumns())
-                    ->ajax([
-                        'data' => 'function(d) {
-                            d.name = $("#filter_name").val();
-                            d.page_id = $("#filter_page_id").val();
-                        }'
-                    ])
+                    ->minifiedAjax()
                     ->parameters([
                         'dom' => 'Bfrtip',
                         'buttons' => ['excel', 'csv', 'print', 'pdf'],
-                        'initComplete' => 'function() {
-                            $("#filter").submit(function(event) {
-                                event.preventDefault();
-                                $("#pageactiondatatable").DataTable().ajax.reload();
-                            });
-                        }'
                     ])
                     ->orderBy(2, 'ASC');
     }

@@ -152,7 +152,7 @@
             </div>
             <div class="collapse show" id="venueCard">
                 <div class="card-body p-4">
-                    <div class="row g-3">
+                    <div class="row g-3 mb-4">
                         <div class="col-md-6">
                             <label class="form-label fw-bold text-dark small mb-1">{{ __('app.venue_name') }}</label>
                             <input type="text" name="venue_name" class="form-control" value="{{ old('venue_name', $wedding->venue_name) }}" placeholder="ឧ. គេហដ្ឋានខាងស្រី / មជ្ឈមណ្ឌលសិរីមង្គល">
@@ -169,12 +169,99 @@
                             <label class="form-label fw-bold text-dark small mb-1">{{ __('app.venue_address') }}</label>
                             <textarea name="venue_address" class="form-control" rows="2" placeholder="ឧ. ភូមិព្រៃខ្លាទី១ ឃុំព្រៃខ្លា ស្រុកស្វាយអន្ទរ ខេត្តព្រៃវែង">{{ old('venue_address', $wedding->venue_address) }}</textarea>
                         </div>
+                    </div>
 
-                        <div class="col-md-12">
-                            <label class="form-label fw-bold text-dark small mb-1">{{ __('app.music_url') }}</label>
-                            <div class="input-group">
-                                <span class="input-group-text bg-white text-muted"><i class="fas fa-music"></i></span>
-                                <input type="url" name="music_url" class="form-control" value="{{ old('music_url', $wedding->music_url) }}" placeholder="https://...">
+                    <!-- Background Music Management -->
+                    <div class="p-3 bg-light rounded-3 border">
+                        <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+                            <h6 class="fw-bold text-dark mb-0"><i class="fa-solid fa-music text-primary me-2"></i>{{ __('បទភ្លេង / ចម្រៀង Background (Wedding Music)') }}</h6>
+                            <div class="d-flex gap-2">
+                                <span class="badge bg-danger text-white rounded-pill px-2 py-1 small"><i class="fab fa-youtube me-1"></i> YouTube Link</span>
+                                <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill px-2 py-1 small"><i class="fas fa-file-audio me-1"></i> MP3, WAV (Max: 20MB)</span>
+                            </div>
+                        </div>
+
+                        <div class="row g-3 align-items-center">
+                            <!-- Left: Upload Song File -->
+                            <div class="col-lg-6">
+                                <label class="form-label fw-bold text-dark small mb-1">{{ __('បញ្ចូល ឬផ្ទុកឡើងបទចម្រៀងផ្ទាល់ខ្លួន (Upload Song File)') }}</label>
+                                <div class="input-group">
+                                    <input type="file" name="music_file" id="musicFileInput" class="form-control" accept="audio/mp3,audio/wav,audio/ogg,audio/m4a,audio/aac,audio/*" onchange="handleAudioSelect(this)">
+                                    <button class="btn btn-outline-secondary" type="button" onclick="document.getElementById('musicFileInput').click()">
+                                        <i class="fas fa-upload me-1"></i> Browse
+                                    </button>
+                                </div>
+                                <small class="text-muted d-block mt-1">ជ្រើសរើសឯកសារបទចម្រៀង MP3 ពីកុំព្យូទ័រ ឬទូរស័ព្ទរបស់អ្នក</small>
+                                @error('music_file') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
+                            </div>
+
+                            <!-- Right: Direct URL or YouTube or Preset -->
+                            <div class="col-lg-6">
+                                <label class="form-label fw-bold text-dark small mb-1">
+                                    {{ __('ឬ ដំណរភ្ជាប់បទចម្រៀង YouTube / MP3 Link') }}
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-white text-muted"><i class="fas fa-link"></i></span>
+                                    <input type="text" name="music_url" id="musicUrlInput" class="form-control" value="{{ old('music_url', $wedding->music_url) }}" placeholder="https://www.youtube.com/watch?v=... ឬ https://youtu.be/..." oninput="handleUrlChange(this.value)">
+                                </div>
+                                <div class="mt-1 d-flex flex-wrap gap-2 align-items-center justify-content-between">
+                                    <button type="button" class="btn btn-sm btn-link p-0 text-decoration-none small text-primary" onclick="setPresetMusic('assets/audio/wedding-march.mp3')">
+                                        <i class="fas fa-compact-disc me-1"></i> ប្រើបទភ្លេងការស្តង់ដារ (Wedding March)
+                                    </button>
+                                    <small class="text-muted small">Paste YouTube URL បានភ្លាមៗ</small>
+                                </div>
+                            </div>
+
+                            <!-- Audio Live Preview Player Box -->
+                            <div class="col-12 mt-3">
+                                @php
+                                    $curUrl = $wedding ? $wedding->music_url : '';
+                                    $isYt = false;
+                                    $ytId = '';
+                                    if (!empty($curUrl) && preg_match('/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/|youtube\.com\/shorts\/)([a-zA-Z0-9_-]{11})/', $curUrl, $m)) {
+                                        $isYt = true;
+                                        $ytId = $m[1];
+                                    }
+                                    $currentAudio = $curUrl && !$isYt
+                                        ? (\Illuminate\Support\Str::startsWith($curUrl, ['http://', 'https://']) ? $curUrl : asset($curUrl))
+                                        : asset('assets/audio/wedding-march.mp3');
+                                @endphp
+                                <div class="p-3 bg-white rounded-3 border d-flex flex-wrap align-items-center justify-content-between gap-3 shadow-sm">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="rounded-circle bg-primary bg-opacity-10 text-primary d-flex align-items-center justify-content-center" id="musicIconCircle" style="width: 42px; height: 42px;">
+                                            <i class="{{ $isYt ? 'fab fa-youtube text-danger' : 'fas fa-play' }}" id="musicPreviewIcon"></i>
+                                        </div>
+                                        <div>
+                                            <strong class="text-dark small d-block" id="currentSongLabel">
+                                                @if($isYt)
+                                                    {{ __('YouTube Music Video:') }} {{ $curUrl }}
+                                                @elseif($wedding && $wedding->music_url)
+                                                    {{ __('បទចម្រៀងបច្ចុប្បន្ន:') }} {{ basename($wedding->music_url) }}
+                                                @else
+                                                    {{ __('បទចម្រៀងស្តង់ដារ (Default): Wedding March') }}
+                                                @endif
+                                            </strong>
+                                            <small class="text-muted" id="songStatusText">
+                                                @if($isYt)
+                                                    {{ __('បទនេះនឹងត្រូវចាក់ដោយស្វ័យប្រវត្តិក្នងធៀបការតាមរយៈ YouTube Player') }}
+                                                @else
+                                                    {{ __('អ្នកអាចស្តាប់សាកល្បងនៅទីនេះ') }}
+                                                @endif
+                                            </small>
+                                        </div>
+                                    </div>
+                                    <div id="audioPlayerContainer" class="{{ $isYt ? 'd-none' : '' }}">
+                                        <audio id="audioLivePreview" controls class="my-1" style="height: 36px; max-width: 320px;">
+                                            <source id="audioSourceEl" src="{{ $currentAudio }}" type="audio/mpeg">
+                                            Your browser does not support the audio element.
+                                        </audio>
+                                    </div>
+                                    <div id="ytBadgeContainer" class="{{ $isYt ? '' : 'd-none' }}">
+                                        <a href="{{ $curUrl }}" target="_blank" id="ytExternalLink" class="btn btn-sm btn-outline-danger rounded-pill px-3">
+                                            <i class="fab fa-youtube me-1"></i> បើកមើលលើ YouTube
+                                        </a>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -275,6 +362,101 @@
                 if (fileName) fileName.textContent = 'Selected: ' + file.name;
             }
             reader.readAsDataURL(file);
+        }
+    }
+
+    function handleAudioSelect(input) {
+        if (input.files && input.files[0]) {
+            var file = input.files[0];
+            var url = URL.createObjectURL(file);
+            var audioPlayer = document.getElementById('audioLivePreview');
+            var sourceEl = document.getElementById('audioSourceEl');
+            var label = document.getElementById('currentSongLabel');
+            var status = document.getElementById('songStatusText');
+
+            if (sourceEl && audioPlayer) {
+                sourceEl.src = url;
+                audioPlayer.load();
+                audioPlayer.play().catch(function(){});
+            }
+            if (label) label.textContent = 'បទដែលបានជ្រើស (New File): ' + file.name;
+            if (status) status.textContent = 'ទំហំ: ' + (file.size / (1024 * 1024)).toFixed(2) + ' MB (រួចរាល់សម្រាប់ការ Save)';
+            
+            // Clear music url input if file uploaded
+            var urlInput = document.getElementById('musicUrlInput');
+            if (urlInput) urlInput.value = '';
+        }
+    }
+
+    function setPresetMusic(presetPath) {
+        var urlInput = document.getElementById('musicUrlInput');
+        if (urlInput) urlInput.value = presetPath;
+
+        var fileInput = document.getElementById('musicFileInput');
+        if (fileInput) fileInput.value = '';
+
+        var audioPlayer = document.getElementById('audioLivePreview');
+        var sourceEl = document.getElementById('audioSourceEl');
+        var label = document.getElementById('currentSongLabel');
+        var status = document.getElementById('songStatusText');
+
+        if (sourceEl && audioPlayer) {
+            sourceEl.src = "{{ asset('') }}" + presetPath;
+            audioPlayer.load();
+            audioPlayer.play().catch(function(){});
+        }
+        if (label) label.textContent = 'បទចម្រៀងស្តង់ដារ: Wedding March';
+        if (status) status.textContent = 'បានជ្រើសរើសបទចម្រៀងស្តង់ដារ';
+
+        document.getElementById('audioPlayerContainer').classList.remove('d-none');
+        document.getElementById('ytBadgeContainer').classList.add('d-none');
+        document.getElementById('musicPreviewIcon').className = 'fas fa-play';
+    }
+
+    function extractYoutubeId(url) {
+        if (!url) return null;
+        var regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=|shorts\/)([^#\&\?]*).*/;
+        var match = url.match(regExp);
+        return (match && match[2].length === 11) ? match[2] : null;
+    }
+
+    function handleUrlChange(url) {
+        var ytId = extractYoutubeId(url);
+        var playerContainer = document.getElementById('audioPlayerContainer');
+        var ytContainer = document.getElementById('ytBadgeContainer');
+        var label = document.getElementById('currentSongLabel');
+        var status = document.getElementById('songStatusText');
+        var icon = document.getElementById('musicPreviewIcon');
+        var ytLink = document.getElementById('ytExternalLink');
+
+        if (ytId) {
+            playerContainer.classList.add('d-none');
+            ytContainer.classList.remove('d-none');
+            if (icon) icon.className = 'fab fa-youtube text-danger';
+            if (label) label.textContent = 'YouTube Video ID: ' + ytId;
+            if (status) status.textContent = 'បទនេះនឹងត្រូវចាក់ដោយស្វ័យប្រវត្តិក្នងធៀបការតាមរយៈ YouTube Player';
+            if (ytLink) ytLink.href = url;
+            
+            // Pause HTML5 audio
+            var audioPlayer = document.getElementById('audioLivePreview');
+            if (audioPlayer) audioPlayer.pause();
+        } else if (url && (url.endsWith('.mp3') || url.endsWith('.wav') || url.endsWith('.ogg') || url.endsWith('.m4a'))) {
+            playerContainer.classList.remove('d-none');
+            ytContainer.classList.add('d-none');
+            if (icon) icon.className = 'fas fa-play';
+            if (label) label.textContent = 'Audio Stream URL: ' + url;
+            if (status) status.textContent = 'អាចចាក់ស្តាប់សាកល្បងបាន';
+            
+            var audioPlayer = document.getElementById('audioLivePreview');
+            var sourceEl = document.getElementById('audioSourceEl');
+            if (sourceEl && audioPlayer) {
+                sourceEl.src = url;
+                audioPlayer.load();
+            }
+        } else {
+            playerContainer.classList.remove('d-none');
+            ytContainer.classList.add('d-none');
+            if (icon) icon.className = 'fas fa-play';
         }
     }
 </script>

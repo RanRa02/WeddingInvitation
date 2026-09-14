@@ -25,18 +25,24 @@ class CustomerGuestDatatable extends DataTable
                 return '<span class="fw-bold text-dark">'.e($guest->name).'</span>';
             })
             ->editColumn('side', function ($guest) {
-                $bg = $guest->side == 'groom' ? 'bg-primary bg-opacity-15 text-primary' : ($guest->side == 'bride' ? 'bg-danger bg-opacity-15 text-danger' : 'bg-warning bg-opacity-15 text-dark');
-                return '<span class="badge '.$bg.' rounded-pill px-3 py-1">'.ucfirst($guest->side).'</span>';
+                $style = $guest->side == 'groom' 
+                    ? 'background: rgba(24, 119, 242, 0.12); color: #1877f2;' 
+                    : ($guest->side == 'bride' ? 'background: rgba(234, 84, 85, 0.12); color: #ea5455;' : 'background: rgba(255, 159, 67, 0.12); color: #ff9f43;');
+                return '<span class="badge rounded-pill px-3 py-1 fw-bold" style="'.$style.'">'.ucfirst($guest->side).'</span>';
             })
             ->editColumn('table_number', function ($guest) {
-                return '<span class="badge bg-secondary bg-opacity-15 text-dark rounded-pill px-3 py-1 fw-bold">តុ '.($guest->table_number ?? '-').'</span>';
+                return '<span class="badge rounded-pill px-3 py-1 fw-bold" style="background: rgba(108, 117, 125, 0.12); color: #495057;">តុ '.($guest->table_number ?? '-').'</span>';
             })
             ->editColumn('invitation_code', function ($guest) {
                 return '<code class="text-primary font-monospace fw-bold">'.$guest->invitation_code.'</code>';
             })
             ->editColumn('attendance', function ($guest) {
-                $bg = $guest->attendance == 'attending' ? 'bg-success bg-opacity-15 text-success' : ($guest->attendance == 'declined' ? 'bg-danger bg-opacity-15 text-danger' : 'bg-warning bg-opacity-15 text-dark');
-                return '<span class="badge '.$bg.' rounded-pill px-3 py-1">'.ucfirst($guest->attendance).'</span>';
+                $style = $guest->attendance == 'attending' 
+                    ? 'background: rgba(40, 199, 111, 0.15); color: #1e874b; border: 1px solid rgba(40, 199, 111, 0.3);' 
+                    : ($guest->attendance == 'declined' 
+                        ? 'background: rgba(234, 84, 85, 0.15); color: #d63031; border: 1px solid rgba(234, 84, 85, 0.3);' 
+                        : 'background: rgba(255, 159, 67, 0.15); color: #d35400; border: 1px solid rgba(255, 159, 67, 0.3);');
+                return '<span class="badge rounded-pill px-3 py-1 fw-bold" style="'.$style.'">'.ucfirst($guest->attendance).'</span>';
             })
             ->addColumn('action', 'customer.guests.action')
             ->rawColumns(['name', 'side', 'table_number', 'invitation_code', 'attendance', 'action']);
@@ -51,8 +57,8 @@ class CustomerGuestDatatable extends DataTable
     public function query(Guest $model, Request $request)
     {
         $query = $model->newQuery()->where('user_id', Auth::id());
-        if ($request->name) {
-            $query->where('name', 'like', '%'.$request->name.'%');
+        if ($request->filled('name') && $request->name !== 'undefined') {
+            $query->where('name', 'ilike', '%'.$request->name.'%');
         }
 
         return $query->select(['guests.*']);
@@ -68,20 +74,10 @@ class CustomerGuestDatatable extends DataTable
         return $this->builder()
                     ->setTableId('customerguestdatatable')
                     ->columns($this->getColumns())
-                    ->ajax([
-                        'data' => 'function(d) {
-                            d.name = $("#name").val();
-                        }'
-                    ])
+                    ->minifiedAjax()
                     ->parameters([
                         'dom' => 'Bfrtip',
                         'buttons' => ['excel', 'csv', 'print', 'pdf'],
-                        'initComplete' => 'function() {
-                            $("#filter").submit(function(event) {
-                                event.preventDefault();
-                                $("#customerguestdatatable").DataTable().ajax.reload();
-                            });
-                        }'
                     ]);
     }
 

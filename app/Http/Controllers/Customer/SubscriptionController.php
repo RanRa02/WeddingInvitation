@@ -48,6 +48,6 @@ class SubscriptionController extends Controller
         $user->update(['guest_limit' => $plan->guest_limit]);
 
         return redirect()->route('customer.wedding.create')
-            ->with('success', 'ការទូទាត់ជោគជ័យ! កញ្ចប់សេវាកម្ម (' . $plan->name . ') ត្រូវបានបើកដំណើរការ (Subscription activated successfully!)');
+            ->with('success', __('app.subscription_activated_successfully'));
     }
 }

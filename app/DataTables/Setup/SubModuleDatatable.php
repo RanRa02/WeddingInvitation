@@ -27,18 +27,17 @@ class SubModuleDatatable extends DataTable
                 </span>';
             })
             ->editColumn('icon', function ($subModule) {
-                return '<span class="badge bg-light text-dark p-2 border"><i class="fas '.$subModule->icon.' me-1" style="color: #d8af65;"></i> '.$subModule->icon.'</span>';
+                $icon = $subModule->icon ?? 'fa-folder';
+                $iconClass = str_starts_with($icon, 'fa-') ? 'fas ' . $icon : (str_contains($icon, 'fa') ? $icon : 'fas ' . $icon);
+                return '<div class="rounded-circle d-flex align-items-center justify-content-center mx-auto" style="width: 32px; height: 32px; background: rgba(24, 119, 242, 0.08); color: #1877f2; font-size: 15px;"><i class="'.$iconClass.'"></i></div>';
             })
             ->editColumn('status', function ($subModule) {
                 return $subModule->status === 'active'
-                    ? '<span class="badge bg-success bg-opacity-15 text-success rounded-pill px-3 py-1">Active</span>'
-                    : '<span class="badge bg-danger bg-opacity-15 text-danger rounded-pill px-3 py-1">Inactive</span>';
-            })
-            ->addColumn('pages_count', function ($subModule) {
-                return '<span class="badge bg-info bg-opacity-15 text-info rounded-pill px-3 py-1 fw-bold">'.$subModule->pages()->count().' Pages</span>';
+                    ? '<span class="badge rounded-pill px-3 py-1 fw-bold" style="background: rgba(40, 199, 111, 0.15) !important; color: #1e874b !important; border: 1px solid rgba(40, 199, 111, 0.3) !important; font-size: 11.5px;">Active</span>'
+                    : '<span class="badge rounded-pill px-3 py-1 fw-bold" style="background: rgba(234, 84, 85, 0.15) !important; color: #d63031 !important; border: 1px solid rgba(234, 84, 85, 0.3) !important; font-size: 11.5px;">Inactive</span>';
             })
             ->addColumn('action', 'admin.menu_settings.sub_modules_action')
-            ->rawColumns(['module_id', 'icon', 'status', 'pages_count', 'action']);
+            ->rawColumns(['module_id', 'icon', 'status', 'action']);
     }
 
     /**
@@ -50,13 +49,13 @@ class SubModuleDatatable extends DataTable
     public function query(SubModule $model, Request $request)
     {
         $query = $model->newQuery()->with('module');
-        if ($request->filled('name')) {
+        if ($request->filled('name') && $request->name !== 'undefined') {
             $query->where(function ($q) use ($request) {
-                $q->where('name', 'like', '%'.$request->name.'%')
-                  ->orWhere('name_kh', 'like', '%'.$request->name.'%');
+                $q->where('name', 'ilike', '%'.$request->name.'%')
+                  ->orWhere('name_kh', 'ilike', '%'.$request->name.'%');
             });
         }
-        if ($request->filled('module_id')) {
+        if ($request->filled('module_id') && $request->module_id !== 'undefined') {
             $query->where('module_id', $request->module_id);
         }
 
@@ -73,21 +72,10 @@ class SubModuleDatatable extends DataTable
         return $this->builder()
                     ->setTableId('submoduledatatable')
                     ->columns($this->getColumns())
-                    ->ajax([
-                        'data' => 'function(d) {
-                            d.name = $("#filter_name").val();
-                            d.module_id = $("#filter_module_id").val();
-                        }'
-                    ])
+                    ->minifiedAjax()
                     ->parameters([
                         'dom' => 'Bfrtip',
                         'buttons' => ['excel', 'csv', 'print', 'pdf'],
-                        'initComplete' => 'function() {
-                            $("#filter").submit(function(event) {
-                                event.preventDefault();
-                                $("#submoduledatatable").DataTable().ajax.reload();
-                            });
-                        }'
                     ])
                     ->orderBy(2, 'ASC');
     }
@@ -106,7 +94,6 @@ class SubModuleDatatable extends DataTable
             Column::make('icon')->title(__('Icon'))->width(100)->addClass('text-center')->orderable(false)->searchable(false),
             Column::make('sort_order')->title(__('Order'))->width(80)->addClass('text-center'),
             Column::make('status')->title(__('Status'))->width(90)->addClass('text-center'),
-            Column::computed('pages_count')->title(__('Pages'))->width(90)->addClass('text-center')->orderable(false)->searchable(false),
             Column::computed('action', __('Actions'))->exportable(false)->printable(false)->width(60)->addClass('text-end'),
         ];
     }

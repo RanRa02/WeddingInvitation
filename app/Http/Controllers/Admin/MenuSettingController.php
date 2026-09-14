@@ -116,7 +116,7 @@ class MenuSettingController extends Controller
 
         Module::create($validated);
 
-        return redirect()->route('admin.menu-settings.modules.index')->with('success', 'Module created successfully!');
+        return redirect()->route('admin.menu-settings.modules.index')->with('success', __('app.module_created_successfully'));
     }
 
     /**
@@ -134,7 +134,7 @@ class MenuSettingController extends Controller
 
         $module->update($validated);
 
-        return redirect()->route('admin.menu-settings.modules.index')->with('success', 'Module updated successfully!');
+        return redirect()->route('admin.menu-settings.modules.index')->with('success', __('app.module_updated_successfully'));
     }
 
     /**
@@ -143,7 +143,7 @@ class MenuSettingController extends Controller
     public function destroyModule(Module $module)
     {
         $module->delete();
-        return redirect()->route('admin.menu-settings.modules.index')->with('success', 'Module deleted successfully!');
+        return redirect()->route('admin.menu-settings.modules.index')->with('success', __('app.module_deleted_successfully'));
     }
 
     /**
@@ -164,7 +164,7 @@ class MenuSettingController extends Controller
 
         SubModule::create($validated);
 
-        return redirect()->route('admin.menu-settings.sub-modules.index')->with('success', 'Sub-Module created successfully!');
+        return redirect()->route('admin.menu-settings.sub-modules.index')->with('success', __('app.sub_module_created_successfully'));
     }
 
     /**
@@ -183,7 +183,7 @@ class MenuSettingController extends Controller
 
         $subModule->update($validated);
 
-        return redirect()->route('admin.menu-settings.sub-modules.index')->with('success', 'Sub-Module updated successfully!');
+        return redirect()->route('admin.menu-settings.sub-modules.index')->with('success', __('app.sub_module_updated_successfully'));
     }
 
     /**
@@ -192,7 +192,7 @@ class MenuSettingController extends Controller
     public function destroySubModule(SubModule $subModule)
     {
         $subModule->delete();
-        return redirect()->route('admin.menu-settings.sub-modules.index')->with('success', 'Sub-Module deleted successfully!');
+        return redirect()->route('admin.menu-settings.sub-modules.index')->with('success', __('app.sub_module_deleted_successfully'));
     }
 
     /**
@@ -225,7 +225,7 @@ class MenuSettingController extends Controller
             );
         }
 
-        return redirect()->route('admin.menu-settings.pages.index')->with('success', 'Page created successfully!');
+        return redirect()->route('admin.menu-settings.pages.index')->with('success', __('app.page_created_successfully'));
     }
 
     /**
@@ -247,7 +247,7 @@ class MenuSettingController extends Controller
 
         $page->update($validated);
 
-        return redirect()->route('admin.menu-settings.pages.index')->with('success', 'Page updated successfully!');
+        return redirect()->route('admin.menu-settings.pages.index')->with('success', __('app.page_updated_successfully'));
     }
 
     /**
@@ -256,7 +256,7 @@ class MenuSettingController extends Controller
     public function destroyPage(Page $page)
     {
         $page->delete();
-        return redirect()->route('admin.menu-settings.pages.index')->with('success', 'Page deleted successfully!');
+        return redirect()->route('admin.menu-settings.pages.index')->with('success', __('app.page_deleted_successfully'));
     }
 
     /**
@@ -280,7 +280,7 @@ class MenuSettingController extends Controller
 
         PageAction::create($validated);
 
-        return redirect()->route('admin.menu-settings.page-actions.index')->with('success', 'Page Action created successfully!');
+        return redirect()->route('admin.menu-settings.page-actions.index')->with('success', __('app.page_action_created_successfully'));
     }
 
     /**
@@ -302,7 +302,7 @@ class MenuSettingController extends Controller
 
         $pageAction->update($validated);
 
-        return redirect()->route('admin.menu-settings.page-actions.index')->with('success', 'Page Action updated successfully!');
+        return redirect()->route('admin.menu-settings.page-actions.index')->with('success', __('app.page_action_updated_successfully'));
     }
 
     /**
@@ -311,7 +311,7 @@ class MenuSettingController extends Controller
     public function destroyPageAction(PageAction $pageAction)
     {
         $pageAction->delete();
-        return redirect()->route('admin.menu-settings.page-actions.index')->with('success', 'Page Action deleted successfully!');
+        return redirect()->route('admin.menu-settings.page-actions.index')->with('success', __('app.page_action_deleted_successfully'));
     }
 
     /**
@@ -345,7 +345,7 @@ class MenuSettingController extends Controller
             }
         }
 
-        return redirect()->route('admin.menu-settings.roles.index')->with('success', 'Role & Menu Access updated successfully!');
+        return redirect()->route('admin.menu-settings.roles.index')->with('success', __('app.role_access_updated_successfully'));
     }
 
     // ==========================================
@@ -530,7 +530,7 @@ class MenuSettingController extends Controller
             }
         });
 
-        return redirect()->back()->with('success', 'System Structure imported and synchronized successfully!');
+        return redirect()->back()->with('success', __('app.system_structure_imported_successfully'));
     }
 
     public function importModules(Request $request)
